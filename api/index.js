@@ -357,30 +357,9 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
-// Middleware de autenticação
-const authenticateAdmin = async (req, res, next) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  
-  try {
-    const { data: admin, error } = await supabase
-      .from('admin')
-      .select('*')
-      .eq('token', token)
-      .single();
-    
-    if (error || !admin) {
-      return res.status(403).json({ error: 'Acesso negado' });
-    }
-    
-    next();
-  } catch (error) {
-    res.status(500).json({ error: 'Erro de autenticação' });
-  }
-};
-
 // ============ ROTAS ADMIN - CRUD DE HABILIDADES ============
 
-app.post('/api/admin/habilidades', authenticateAdmin, async (req, res) => {
+app.post('/api/admin/habilidades', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('habilidades')
@@ -395,7 +374,7 @@ app.post('/api/admin/habilidades', authenticateAdmin, async (req, res) => {
   }
 });
 
-app.put('/api/admin/habilidades/:id', authenticateAdmin, async (req, res) => {
+app.put('/api/admin/habilidades/:id', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('habilidades')
@@ -411,7 +390,7 @@ app.put('/api/admin/habilidades/:id', authenticateAdmin, async (req, res) => {
   }
 });
 
-app.delete('/api/admin/habilidades/:id', authenticateAdmin, async (req, res) => {
+app.delete('/api/admin/habilidades/:id', async (req, res) => {
   try {
     const { error } = await supabase
       .from('habilidades')
@@ -427,9 +406,9 @@ app.delete('/api/admin/habilidades/:id', authenticateAdmin, async (req, res) => 
 
 // ============ ROTAS ADMIN - CRUD GENÉRICO ============
 
-// Helper para CRUD de itens
+// Helper para CRUD de itens (sem autenticação)
 const createItemRoutes = (tableName, itemName) => {
-  app.post(`/api/admin/${tableName}`, authenticateAdmin, async (req, res) => {
+  app.post(`/api/admin/${tableName}`, async (req, res) => {
     try {
       const { data, error } = await supabase
         .from(tableName)
@@ -444,7 +423,7 @@ const createItemRoutes = (tableName, itemName) => {
     }
   });
 
-  app.put(`/api/admin/${tableName}/:id`, authenticateAdmin, async (req, res) => {
+  app.put(`/api/admin/${tableName}/:id`, async (req, res) => {
     try {
       const { data, error } = await supabase
         .from(tableName)
@@ -460,7 +439,7 @@ const createItemRoutes = (tableName, itemName) => {
     }
   });
 
-  app.delete(`/api/admin/${tableName}/:id`, authenticateAdmin, async (req, res) => {
+  app.delete(`/api/admin/${tableName}/:id`, async (req, res) => {
     try {
       const { error } = await supabase
         .from(tableName)

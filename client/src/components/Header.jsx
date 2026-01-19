@@ -21,8 +21,8 @@ function Header() {
           <Link to="/characters" className="nav-link">Personagens</Link>
           <Link to="/dice" className="nav-link">Dados</Link>
           <Link to="/database" className="nav-link">Database</Link>
-          <Link to="/admin/login" className="nav-link admin-link">
-            {isAuthenticated ? '🎭 Admin' : '🔒 Mestre'}
+          <Link to="/admin" className="nav-link admin-link">
+            🎭 Mestre
           </Link>
         </nav>
       </div>

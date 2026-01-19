@@ -74,9 +74,7 @@ function AdminManageItems() {
   const handleSaveNew = async () => {
     try {
       const endpoint = type === 'habilidades' ? '/api/admin/habilidades' : `/api/admin/${type}`;
-      await axios.post(endpoint, newItem, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(endpoint, newItem);
       
       await loadItems();
       setNewItem(null);
@@ -90,9 +88,7 @@ function AdminManageItems() {
   const handleUpdate = async (id) => {
     try {
       const endpoint = type === 'habilidades' ? '/api/admin/habilidades' : `/api/admin/${type}`;
-      await axios.put(`${endpoint}/${id}`, editingItem.data, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`${endpoint}/${id}`, editingItem.data);
       
       await loadItems();
       setEditingItem(null);
@@ -110,9 +106,7 @@ function AdminManageItems() {
 
     try {
       const endpoint = type === 'habilidades' ? '/api/admin/habilidades' : `/api/admin/${type}`;
-      await axios.delete(`${endpoint}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.delete(`${endpoint}/${id}`);
       
       await loadItems();
       alert('Item deletado com sucesso!');

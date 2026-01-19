@@ -56,9 +56,7 @@ function AdminCharacters() {
 
   const handleSave = async () => {
     try {
-      await axios.put(`/api/characters/${selectedChar.id}`, selectedChar, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`/api/characters/${selectedChar.id}`, selectedChar);
       
       setCharacters(characters.map(c => 
         c.id === selectedChar.id ? selectedChar : c
@@ -79,9 +77,7 @@ function AdminCharacters() {
     }
 
     try {
-      await axios.delete(`/api/characters/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.delete(`/api/characters/${id}`);
       
       setCharacters(characters.filter(c => c.id !== id));
       alert('Personagem deletado com sucesso!');

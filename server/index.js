@@ -377,32 +377,11 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
-// Middleware de autenticação
-const authenticateAdmin = async (req, res, next) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  
-  try {
-    const { data: admin, error } = await supabase
-      .from('admin')
-      .select('*')
-      .eq('token', token)
-      .single();
-    
-    if (error || !admin) {
-      return res.status(403).json({ error: 'Acesso negado' });
-    }
-    
-    next();
-  } catch (error) {
-    res.status(500).json({ error: 'Erro de autenticação' });
-  }
-};
-
-// ============ ROTAS ADMIN - CRUD GENÉRICO ============
+// ============ ROTAS ADMIN - CRUD GENÉRICO (SEM AUTENTICAÇÃO) ============
 
 // Helper para CRUD de itens
 const createItemRoutes = (tableName, itemName) => {
-  app.post(`/api/admin/${tableName}`, authenticateAdmin, async (req, res) => {
+  app.post(`/api/admin/${tableName}`, async (req, res) => {
     try {
       const { data, error } = await supabase
         .from(tableName)
@@ -417,7 +396,7 @@ const createItemRoutes = (tableName, itemName) => {
     }
   });
 
-  app.put(`/api/admin/${tableName}/:id`, authenticateAdmin, async (req, res) => {
+  app.put(`/api/admin/${tableName}/:id`, async (req, res) => {
     try {
       const { data, error } = await supabase
         .from(tableName)
@@ -433,7 +412,7 @@ const createItemRoutes = (tableName, itemName) => {
     }
   });
 
-  app.delete(`/api/admin/${tableName}/:id`, authenticateAdmin, async (req, res) => {
+  app.delete(`/api/admin/${tableName}/:id`, async (req, res) => {
     try {
       const { error } = await supabase
         .from(tableName)

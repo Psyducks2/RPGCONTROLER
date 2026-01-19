@@ -30,32 +30,11 @@ function App() {
               <Route path="/dice" element={<DiceRoller />} />
               <Route path="/database" element={<Database />} />
               
-              {/* Rotas Admin */}
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route 
-                path="/admin/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/admin/characters" 
-                element={
-                  <ProtectedRoute>
-                    <AdminCharacters />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/admin/manage/:type" 
-                element={
-                  <ProtectedRoute>
-                    <AdminManageItems />
-                  </ProtectedRoute>
-                } 
-              />
+              {/* Rotas Admin (Sem autenticação) */}
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/characters" element={<AdminCharacters />} />
+              <Route path="/admin/manage/:type" element={<AdminManageItems />} />
             </Routes>
           </main>
         </div>
