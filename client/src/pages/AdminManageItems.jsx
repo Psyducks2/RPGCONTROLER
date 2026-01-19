@@ -87,10 +87,10 @@ function AdminManageItems() {
     }
   };
 
-  const handleUpdate = async (index) => {
+  const handleUpdate = async (id) => {
     try {
       const endpoint = type === 'habilidades' ? '/api/admin/habilidades' : `/api/admin/${type}`;
-      await axios.put(`${endpoint}/${index}`, editingItem.data, {
+      await axios.put(`${endpoint}/${id}`, editingItem.data, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -103,14 +103,14 @@ function AdminManageItems() {
     }
   };
 
-  const handleDelete = async (index, nome) => {
+  const handleDelete = async (id, nome) => {
     if (!window.confirm(`Tem certeza que deseja deletar "${nome}"?`)) {
       return;
     }
 
     try {
       const endpoint = type === 'habilidades' ? '/api/admin/habilidades' : `/api/admin/${type}`;
-      await axios.delete(`${endpoint}/${index}`, {
+      await axios.delete(`${endpoint}/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -193,9 +193,11 @@ function AdminManageItems() {
       )}
 
       <div className="items-grid">
-        {items.map((item, index) => (
-          <div key={index} className="item-card card">
-            {editingItem && editingItem.index === index ? (
+        {items.map((item) => {
+          const itemId = item.id || item.nome; // Usa ID do Supabase se existir
+          return (
+          <div key={itemId} className="item-card card">
+            {editingItem && editingItem.id === itemId ? (
               <>
                 <h3>✏️ Editando Item</h3>
                 <div className="form-fields">
@@ -212,7 +214,7 @@ function AdminManageItems() {
                   ))}
                 </div>
                 <div className="item-actions">
-                  <button onClick={() => handleUpdate(index)} className="btn-save">
+                  <button onClick={() => handleUpdate(itemId)} className="btn-save">
                     💾 Salvar
                   </button>
                   <button 
@@ -227,7 +229,7 @@ function AdminManageItems() {
               <>
                 <h3>{item.nome}</h3>
                 <div className="item-details">
-                  {Object.entries(item).filter(([key]) => key !== 'nome').map(([key, value]) => (
+                  {Object.entries(item).filter(([key]) => key !== 'nome' && key !== 'id').map(([key, value]) => (
                     <div key={key} className="detail-row">
                       <span className="label">{key}:</span>
                       <span className="value">{value}</span>
@@ -236,13 +238,13 @@ function AdminManageItems() {
                 </div>
                 <div className="item-actions">
                   <button 
-                    onClick={() => setEditingItem({ index, data: { ...item } })}
+                    onClick={() => setEditingItem({ id: itemId, data: { ...item } })}
                     className="btn-edit"
                   >
                     ✏️ Editar
                   </button>
                   <button 
-                    onClick={() => handleDelete(index, item.nome)}
+                    onClick={() => handleDelete(itemId, item.nome)}
                     className="btn-delete"
                   >
                     🗑️ Deletar
@@ -251,7 +253,8 @@ function AdminManageItems() {
               </>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {items.length === 0 && !newItem && (

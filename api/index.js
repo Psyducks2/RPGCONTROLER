@@ -164,7 +164,7 @@ app.get('/api/characters', async (req, res) => {
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    res.json(data);
+    res.json(data.map(convertCharacterFromDB));
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar personagens' });
   }
@@ -185,22 +185,105 @@ app.get('/api/characters/:id', async (req, res) => {
       throw error;
     }
     
-    res.json(data);
+    res.json(convertCharacterFromDB(data));
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar personagem' });
   }
 });
 
+// Helper para converter camelCase para snake_case
+const toSnakeCase = (str) => {
+  return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+};
+
+const convertCharacterToDB = (char) => {
+  return {
+    nome: char.nome,
+    jogador: char.jogador,
+    origem: char.origem,
+    trilha: char.trilha,
+    classe: char.classe,
+    patente: char.patente,
+    nex: char.nex,
+    atributos: char.atributos,
+    pericias: char.pericias,
+    pericias_trainadas: char.periciasTrainadas || char.pericias_trainadas || [],
+    descricao: char.descricao,
+    historia: char.historia,
+    idade: char.idade,
+    aniversario: char.aniversario,
+    local: char.local,
+    peso: char.peso,
+    deslocamento: char.deslocamento,
+    defesa: char.defesa,
+    poderes_origem: char.poderesOrigem || char.poderes_origem || [],
+    habilidades_classe: char.habilidadesClasse || char.habilidades_classe || [],
+    inventario: char.inventario,
+    rituais_conhecidos: char.rituaisConhecidos || char.rituais_conhecidos || [],
+    anotacoes: char.anotacoes,
+    pv_max: char.pvMax || char.pv_max,
+    pv_atual: char.pvAtual || char.pv_atual,
+    san_max: char.sanMax || char.san_max,
+    san_atual: char.sanAtual || char.san_atual,
+    pe_max: char.peMax || char.pe_max,
+    pe_atual: char.peAtual || char.pe_atual,
+    prestigio: char.prestigio || char.prestigio || 0,
+    espaco_usado: char.espacoUsado || char.espaco_usado || 0,
+    espaco_total: char.espacoTotal || char.espaco_total || 10
+  };
+};
+
+const convertCharacterFromDB = (char) => {
+  return {
+    id: char.id,
+    nome: char.nome,
+    jogador: char.jogador,
+    origem: char.origem,
+    trilha: char.trilha,
+    classe: char.classe,
+    patente: char.patente,
+    nex: char.nex,
+    atributos: char.atributos,
+    pericias: char.pericias,
+    periciasTrainadas: char.pericias_trainadas || [],
+    descricao: char.descricao,
+    historia: char.historia,
+    idade: char.idade,
+    aniversario: char.aniversario,
+    local: char.local,
+    peso: char.peso,
+    deslocamento: char.deslocamento,
+    defesa: char.defesa,
+    poderesOrigem: char.poderes_origem || [],
+    habilidadesClasse: char.habilidades_classe || [],
+    inventario: char.inventario,
+    rituaisConhecidos: char.rituais_conhecidos || [],
+    anotacoes: char.anotacoes,
+    pvMax: char.pv_max,
+    pvAtual: char.pv_atual,
+    sanMax: char.san_max,
+    sanAtual: char.san_atual,
+    peMax: char.pe_max,
+    peAtual: char.pe_atual,
+    prestigio: char.prestigio || 0,
+    espacoUsado: char.espaco_usado || 0,
+    espacoTotal: char.espaco_total || 10,
+    createdAt: char.created_at,
+    updatedAt: char.updated_at
+  };
+};
+
 app.post('/api/characters', async (req, res) => {
   try {
+    const dbChar = convertCharacterToDB(req.body);
     const { data, error} = await supabase
       .from('characters')
-      .insert([req.body])
+      .insert([dbChar])
       .select()
       .single();
     
     if (error) throw error;
-    res.status(201).json(data);
+    res.status(201).json(convertCharacterFromDB(data));
   } catch (error) {
     console.error('Erro ao criar personagem:', error);
     res.status(500).json({ error: 'Erro ao criar personagem' });
@@ -209,9 +292,10 @@ app.post('/api/characters', async (req, res) => {
 
 app.put('/api/characters/:id', async (req, res) => {
   try {
+    const dbChar = convertCharacterToDB(req.body);
     const { data, error } = await supabase
       .from('characters')
-      .update(req.body)
+      .update(dbChar)
       .eq('id', req.params.id)
       .select()
       .single();
@@ -223,7 +307,7 @@ app.put('/api/characters/:id', async (req, res) => {
       throw error;
     }
     
-    res.json(data);
+    res.json(convertCharacterFromDB(data));
   } catch (error) {
     res.status(500).json({ error: 'Erro ao atualizar personagem' });
   }

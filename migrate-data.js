@@ -109,15 +109,27 @@ async function migrateData() {
     // Migrar Insanidade
     console.log('😱 Migrando efeitos de insanidade...');
     const insanidade = await readJSON('insanidade.json');
+    // Transformar dados para corresponder ao schema
+    const insanidadeFormatted = insanidade.map((item, index) => ({
+      nome: `Efeito ${item.id || index + 1}`,
+      tipo: 'Paranormal',
+      descricao: item.efeito || item.descricao || ''
+    }));
     const { error: insanidadeError } = await supabase
       .from('insanidade')
-      .insert(insanidade);
+      .insert(insanidadeFormatted);
     if (insanidadeError && insanidadeError.code !== '23505') throw insanidadeError;
     console.log(`✅ ${insanidade.length} efeitos de insanidade migrados`);
 
     // Migrar Dificuldades
     console.log('📊 Migrando dificuldades...');
-    const dificuldades = await readJSON('dificuldades.json');
+    const dificuldadesData = await readJSON('dificuldades.json');
+    // Transformar estrutura para array simples
+    const dificuldades = dificuldadesData.testes ? dificuldadesData.testes.map(teste => ({
+      nome: teste.tipo,
+      dt: teste.DT,
+      descricao: teste.descricao
+    })) : dificuldadesData;
     const { error: dificuldadesError } = await supabase
       .from('dificuldades')
       .insert(dificuldades);
@@ -128,11 +140,45 @@ async function migrateData() {
     console.log('👥 Migrando personagens...');
     const characters = await readJSON('characters.json');
     if (characters.length > 0) {
-      // Remover campo 'id' para deixar o Supabase gerar UUID
-      const charactersWithoutId = characters.map(({ id, ...char }) => char);
+      // Converter para formato do banco (snake_case)
+      const charactersFormatted = characters.map(char => ({
+        nome: char.nome,
+        jogador: char.jogador,
+        origem: char.origem,
+        trilha: char.trilha,
+        classe: char.classe,
+        patente: char.patente || 'Recruta',
+        nex: char.nex || 5,
+        atributos: char.atributos,
+        pericias: char.pericias || {},
+        pericias_trainadas: char.periciasTrainadas || char.pericias_trainadas || [],
+        descricao: char.descricao,
+        historia: char.historia,
+        idade: char.idade,
+        aniversario: char.aniversario,
+        local: char.local,
+        peso: char.peso,
+        deslocamento: char.deslocamento || 9,
+        defesa: char.defesa || 10,
+        poderes_origem: char.poderesOrigem || char.poderes_origem || [],
+        habilidades_classe: char.habilidadesClasse || char.habilidades_classe || [],
+        inventario: char.inventario || [],
+        rituais_conhecidos: char.rituaisConhecidos || char.rituais_conhecidos || [],
+        anotacoes: char.anotacoes,
+        pv_max: char.pvMax || char.pv_max,
+        pv_atual: char.pvAtual || char.pv_atual,
+        san_max: char.sanMax || char.san_max,
+        san_atual: char.sanAtual || char.san_atual,
+        pe_max: char.peMax || char.pe_max,
+        pe_atual: char.peAtual || char.pe_atual,
+        prestigio: char.prestigio || 0,
+        espaco_usado: char.espacoUsado || char.espaco_usado || 0,
+        espaco_total: char.espacoTotal || char.espaco_total || 10
+      }));
+      
       const { error: charactersError } = await supabase
         .from('characters')
-        .insert(charactersWithoutId);
+        .insert(charactersFormatted);
       if (charactersError) throw charactersError;
       console.log(`✅ ${characters.length} personagens migrados`);
     } else {
