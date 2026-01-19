@@ -1,0 +1,16 @@
+[
+  {
+    "nome": "Proteção Leve",
+    "categoria": "I",
+    "defesa": 5,
+    "espaco": 2,
+    "descricao": "Colete balístico leve"
+  },
+  {
+    "nome": "Proteção Pesada",
+    "categoria": "II",
+    "defesa": 10,
+    "espaco": 5,
+    "descricao": "Colete balístico pesado com placas"
+  }
+]

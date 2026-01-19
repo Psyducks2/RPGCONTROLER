@@ -1,0 +1,240 @@
+/* Adições para a ficha completa */
+
+.info-pessoal-card {
+  grid-column: span 1;
+}
+
+.combat-stats-card {
+  grid-column: span 1;
+}
+
+.info-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.info-item-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--bg-tertiary);
+  border-radius: 5px;
+}
+
+.info-item-compact .label {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.info-item-compact .value {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.combat-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.combat-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  border: 2px solid var(--border-color);
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value-large {
+  color: var(--accent-secondary);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.stat-formula {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.abilities-section {
+  margin-bottom: 1.5rem;
+}
+
+.abilities-section:last-child {
+  margin-bottom: 0;
+}
+
+.abilities-section h3 {
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--accent-secondary);
+  font-size: 1.1rem;
+}
+
+.abilities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ability-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-tertiary);
+  border-radius: 5px;
+  border-left: 3px solid var(--accent-primary);
+}
+
+.ability-icon {
+  font-size: 1.2rem;
+}
+
+.ability-name {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.rituais-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ritual-item {
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+}
+
+.ritual-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.ritual-name {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.ritual-circulo {
+  background: var(--accent-primary);
+  color: var(--text-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.ritual-info {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.inventory-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.inventory-header > span {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.inventory-bar {
+  height: 25px;
+  background: var(--bg-tertiary);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.inventory-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  transition: width 0.3s ease;
+}
+
+.inventory-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.inventory-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--bg-tertiary);
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+}
+
+.item-name {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.item-qty {
+  color: var(--accent-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.item-space {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.empty-text {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .sheet-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .info-grid-compact {
+    grid-template-columns: 1fr;
+  }
+  
+  .combat-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .inventory-items {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,128 @@
+[
+  {
+    "nome": "Faca",
+    "tipo": "Corpo a corpo",
+    "categoria": 0,
+    "dano": "1d4",
+    "critico": "19",
+    "alcance": "Curto",
+    "espaco": 1,
+    "descricao": "Arma branca leve e versátil"
+  },
+  {
+    "nome": "Cassetete",
+    "tipo": "Corpo a corpo",
+    "categoria": 0,
+    "dano": "1d6",
+    "critico": "20",
+    "alcance": "Curto",
+    "espaco": 1,
+    "descricao": "Arma de impacto não-letal"
+  },
+  {
+    "nome": "Espada curta",
+    "tipo": "Corpo a corpo",
+    "categoria": "I",
+    "dano": "1d6",
+    "critico": "19",
+    "alcance": "Curto",
+    "espaco": 1,
+    "descricao": "Espada de tamanho médio"
+  },
+  {
+    "nome": "Machado",
+    "tipo": "Corpo a corpo",
+    "categoria": "I",
+    "dano": "1d8",
+    "critico": "x3",
+    "alcance": "Médio",
+    "espaco": 2,
+    "descricao": "Ferramenta e arma de corte"
+  },
+  {
+    "nome": "Acha",
+    "tipo": "Corpo a corpo",
+    "categoria": "I",
+    "dano": "1d12",
+    "critico": "x3",
+    "alcance": "Médio",
+    "espaco": 2,
+    "descricao": "Machado de batalha pesado"
+  },
+  {
+    "nome": "Katana",
+    "tipo": "Corpo a corpo",
+    "categoria": "I",
+    "dano": "1d10",
+    "critico": "19",
+    "alcance": "Médio",
+    "espaco": 2,
+    "descricao": "Espada japonesa afiada"
+  },
+  {
+    "nome": "Pistola",
+    "tipo": "Arma de fogo",
+    "categoria": "I",
+    "dano": "1d12",
+    "critico": "18",
+    "alcance": "Curto",
+    "espaco": 1,
+    "municao": "Curta",
+    "descricao": "Arma de fogo leve"
+  },
+  {
+    "nome": "Revólver",
+    "tipo": "Arma de fogo",
+    "categoria": "I",
+    "dano": "1d10",
+    "critico": "19",
+    "alcance": "Curto",
+    "espaco": 1,
+    "municao": "Curta",
+    "descricao": "Arma confiável de tambor"
+  },
+  {
+    "nome": "Submetralhadora",
+    "tipo": "Arma de fogo",
+    "categoria": "II",
+    "dano": "1d12",
+    "critico": "19",
+    "alcance": "Médio",
+    "espaco": 2,
+    "municao": "Curta",
+    "descricao": "Arma automática compacta"
+  },
+  {
+    "nome": "Fuzil de Assalto",
+    "tipo": "Arma de fogo",
+    "categoria": "II",
+    "dano": "2d10",
+    "critico": "19/x3",
+    "alcance": "Longo",
+    "espaco": 3,
+    "municao": "Longa",
+    "descricao": "Rifle militar automático"
+  },
+  {
+    "nome": "Escopeta",
+    "tipo": "Arma de fogo",
+    "categoria": "II",
+    "dano": "3d8",
+    "critico": "19",
+    "alcance": "Curto",
+    "espaco": 2,
+    "municao": "Cartuchos",
+    "descricao": "Shotgun de alta potência"
+  },
+  {
+    "nome": "Rifle de Precisão",
+    "tipo": "Arma de fogo",
+    "categoria": "III",
+    "dano": "3d10",
+    "critico": "18/x3",
+    "alcance": "Extremo",
+    "espaco": 4,
+    "municao": "Longa",
+    "descricao": "Sniper de longo alcance"
+  }
+]

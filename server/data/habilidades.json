@@ -1,0 +1,226 @@
+[
+  {
+    "nome": "Ataque Especial",
+    "tipo": "Combatente",
+    "nex": 5,
+    "custo": "2 PE",
+    "descricao": "Gaste 2 PE para receber +5 no teste de ataque ou na rolagem de dano",
+    "progressao": "Em NEX 25%: 3 PE, +10. Em NEX 55%: 4 PE, +15. Em NEX 85%: 5 PE, +20"
+  },
+  {
+    "nome": "Armamento Pesado",
+    "tipo": "Poder de Combatente",
+    "prerequisito": "FOR 2",
+    "descricao": "Recebe proficiência com armas pesadas"
+  },
+  {
+    "nome": "Artista Marcial",
+    "tipo": "Poder de Combatente",
+    "descricao": "Ataques desarmados causam 1d6 de dano (letais e ágeis). Em NEX 35%: 1d8. Em NEX 70%: 1d10"
+  },
+  {
+    "nome": "Ataque de Oportunidade",
+    "tipo": "Poder de Combatente",
+    "custo": "1 PE + Reação",
+    "descricao": "Ao sair voluntariamente de um espaço adjacente, pode atacar corpo a corpo"
+  },
+  {
+    "nome": "Combater com Duas Armas",
+    "tipo": "Poder de Combatente",
+    "prerequisito": "AGI 3, treinado em Luta ou Pontaria",
+    "descricao": "Pode fazer dois ataques (um com cada arma), mas sofre penalidade em testes de ataque"
+  },
+  {
+    "nome": "Combate Defensivo",
+    "tipo": "Poder de Combatente",
+    "prerequisito": "INT 2",
+    "descricao": "Ao agredir, pode combater defensivamente. Sofre penalidade em ataque, mas recebe +5 na Defesa"
+  },
+  {
+    "nome": "Golpe Demolidor",
+    "tipo": "Poder de Combatente",
+    "prerequisito": "FOR 2, treinado em Luta",
+    "custo": "1 PE",
+    "descricao": "Ao usar manobra quebrar ou atacar objeto, causa 2 dados de dano extra"
+  },
+  {
+    "nome": "Golpe Pesado",
+    "tipo": "Poder de Combatente",
+    "descricao": "O dano de armas corpo a corpo aumenta em mais um dado do mesmo tipo"
+  },
+  {
+    "nome": "Proteção Pesada",
+    "tipo": "Poder de Combatente",
+    "prerequisito": "NEX 30%",
+    "descricao": "Recebe proficiência com Proteções Pesadas"
+  },
+  {
+    "nome": "Reflexos Defensivos",
+    "tipo": "Poder de Combatente",
+    "prerequisito": "AGI 2",
+    "descricao": "Recebe +2 em Defesa e em testes de resistência"
+  },
+  {
+    "nome": "Saque Rápido",
+    "tipo": "Poder de Combatente",
+    "prerequisito": "Treinado em Iniciativa",
+    "descricao": "Pode sacar ou guardar itens como ação livre. Pode recarregar arma como ação livre uma vez por rodada"
+  },
+  {
+    "nome": "Segurar o Gatilho",
+    "tipo": "Poder de Combatente",
+    "descricao": "Sempre que acerta um ataque com arma de fogo, pode fazer outro ataque"
+  },
+  {
+    "nome": "Eclético",
+    "tipo": "Especialista",
+    "nex": 5,
+    "custo": "2 PE",
+    "descricao": "Pode usar uma perícia que não é treinada como se fosse treinada"
+  },
+  {
+    "nome": "Perito",
+    "tipo": "Especialista",
+    "nex": 5,
+    "custo": "2 PE",
+    "descricao": "Ao fazer um teste de perícia treinada, recebe +1d6 no resultado",
+    "progressao": "Em NEX 25%: 3 PE, +1d8. Em NEX 55%: 4 PE, +1d10. Em NEX 85%: 5 PE, +1d12"
+  },
+  {
+    "nome": "Balística Avançada",
+    "tipo": "Poder de Especialista",
+    "descricao": "Recebe proficiência com armas táticas de fogo e +2 em rolagens de dano com essas armas"
+  },
+  {
+    "nome": "Conhecimento Aplicado",
+    "tipo": "Poder de Especialista",
+    "prerequisito": "INT 2",
+    "custo": "2 PE",
+    "descricao": "Ao fazer teste de perícia (exceto Luta e Pontaria), pode mudar o atributo-base para Intelecto"
+  },
+  {
+    "nome": "Hacker",
+    "tipo": "Poder de Especialista",
+    "prerequisito": "Treinado em Tecnologia",
+    "descricao": "Recebe +5 em testes de Tecnologia para invadir sistemas"
+  },
+  {
+    "nome": "Mãos Rápidas",
+    "tipo": "Poder de Especialista",
+    "prerequisito": "AGI 3, treinado em Crime",
+    "custo": "1 PE",
+    "descricao": "Ao fazer teste de Crime, pode fazê-lo como ação livre"
+  },
+  {
+    "nome": "Mochila de Utilidades",
+    "tipo": "Poder de Especialista",
+    "descricao": "Um item à sua escolha (exceto armas) conta como uma categoria abaixo e ocupa 1 espaço a menos"
+  },
+  {
+    "nome": "Movimento Tático",
+    "tipo": "Poder de Especialista",
+    "prerequisito": "Treinado em Atletismo",
+    "custo": "1 PE",
+    "descricao": "Pode ignorar penalidade em deslocamento por terreno difícil e escalar até o final do turno"
+  },
+  {
+    "nome": "Na Trilha Certa",
+    "tipo": "Poder de Especialista",
+    "custo": "1 PE",
+    "descricao": "Se tiver sucesso em teste para procurar pistas, pode gastar 1 PE para receber bônus no próximo teste"
+  },
+  {
+    "nome": "Nerd",
+    "tipo": "Poder de Especialista",
+    "custo": "2 PE",
+    "descricao": "Uma vez por cena, pode gastar 2 PE para fazer teste de Atualidades (DT 20) e receber informação útil"
+  },
+  {
+    "nome": "Ninja Urbano",
+    "tipo": "Poder de Especialista",
+    "descricao": "Recebe proficiência com armas táticas de ataque corpo a corpo e de distância"
+  },
+  {
+    "nome": "Escolhido pelo Outro Lado",
+    "tipo": "Ocultista",
+    "nex": 5,
+    "descricao": "Aprende um ritual de 1º círculo",
+    "progressao": "Em NEX 25%: 2º círculo. Em NEX 55%: 3º círculo. Em NEX 85%: 4º círculo"
+  },
+  {
+    "nome": "Camuflar Ocultismo",
+    "tipo": "Poder de Ocultista",
+    "custo": "+2 PE",
+    "descricao": "Ao lançar ritual, pode gastar +2 PE para ignorar componentes ritualísticos e gesticulação"
+  },
+  {
+    "nome": "Criar Selo",
+    "tipo": "Poder de Ocultista",
+    "custo": "1 ação de interlúdio + PE igual ao custo do ritual",
+    "descricao": "Permite fabricar selos paranormais. Limite: número máximo igual à Presença"
+  },
+  {
+    "nome": "Envolto em Mistério",
+    "tipo": "Poder de Ocultista",
+    "descricao": "Recebe +5 em Enganação e Intimidação contra pessoas não treinadas em Ocultismo"
+  },
+  {
+    "nome": "Especialista em Elemento",
+    "tipo": "Poder de Ocultista",
+    "descricao": "Aumenta em +2 a DT para resistir aos rituais de um elemento escolhido"
+  },
+  {
+    "nome": "Ferramentas Paranormais",
+    "tipo": "Poder de Ocultista",
+    "descricao": "Reduz a categoria de um item paranormal em I. Permite ativar itens paranormais sem custo em PE"
+  },
+  {
+    "nome": "Fluxo de Poder",
+    "tipo": "Poder de Ocultista",
+    "prerequisito": "NEX 60%",
+    "custo": "Ação livre",
+    "descricao": "Permite manter dois efeitos sustentados de rituais ativos simultaneamente"
+  },
+  {
+    "nome": "Ritual Potente",
+    "tipo": "Poder de Ocultista",
+    "prerequisito": "INT 2",
+    "descricao": "Soma seu Intelecto nas rolagens de dano ou nos efeitos de cura de seus rituais"
+  },
+  {
+    "nome": "Ritual Predileto",
+    "tipo": "Poder de Ocultista",
+    "descricao": "Escolhe um ritual que conhece. Reduz em -1 PE o custo do ritual"
+  },
+  {
+    "nome": "Tatuagem Ritualística",
+    "tipo": "Poder de Ocultista",
+    "descricao": "Símbolos marcados em sua pele reduzem em -1 PE o custo de rituais de alcance pessoal"
+  },
+  {
+    "nome": "Aumento de Atributo",
+    "tipo": "Geral",
+    "nex": 20,
+    "descricao": "Aumenta um atributo à sua escolha em +1",
+    "progressao": "Também em NEX 50%, 80% e 95%. Não pode aumentar além de 5"
+  },
+  {
+    "nome": "Grau de Treinamento",
+    "tipo": "Geral",
+    "nex": 35,
+    "descricao": "Escolhe perícias treinadas. O grau de treinamento aumenta em um nível (treinado → veterano → expert)",
+    "progressao": "Também em NEX 70%"
+  },
+  {
+    "nome": "Treinamento em Perícia",
+    "tipo": "Geral",
+    "descricao": "Escolhe duas perícias para se tornar treinado",
+    "progressao": "A partir de NEX 35%: pode escolher perícias treinadas para veterano. A partir de NEX 70%: pode escolher perícias veteranas para expert"
+  },
+  {
+    "nome": "Versatilidade",
+    "tipo": "Geral",
+    "nex": 50,
+    "descricao": "Escolhe entre receber um poder da sua classe ou o primeiro poder de uma trilha diferente"
+  }
+]

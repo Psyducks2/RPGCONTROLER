@@ -1,0 +1,175 @@
+.database {
+  animation: fadeIn 0.5s ease-in;
+}
+
+.database h1 {
+  margin-bottom: 2rem;
+}
+
+.search-box {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+}
+
+.search-box input {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 1rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  background: var(--bg-secondary);
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-secondary);
+  transform: translateY(-2px);
+}
+
+.tab.active {
+  background: var(--accent-primary);
+  border-color: var(--accent-secondary);
+  box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3);
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.item-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.item-card h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  border-bottom: 2px solid var(--accent-primary);
+  padding-bottom: 0.5rem;
+}
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+
+.detail-row .label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.detail-row .value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.detail-row .value.damage {
+  color: #ef4444;
+  font-size: 1.1rem;
+  font-family: monospace;
+}
+
+.detail-row .value.defense {
+  color: #4ade80;
+  font-size: 1.1rem;
+}
+
+.badge {
+  background: var(--accent-primary);
+  color: var(--text-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.item-description {
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.6;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.ritual-card {
+  background: linear-gradient(135deg, rgba(139, 0, 0, 0.05) 0%, var(--bg-secondary) 100%);
+}
+
+.ritual-header {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.circulo-badge {
+  background: var(--accent-primary);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.elemento-badge {
+  background: var(--bg-tertiary);
+  color: var(--accent-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tabs {
+    justify-content: center;
+  }
+  
+  .tab {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+}

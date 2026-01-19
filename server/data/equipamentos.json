@@ -1,0 +1,44 @@
+[
+  {
+    "nome": "Lanterna Tática",
+    "categoria": "I",
+    "espaco": 1,
+    "descricao": "Ilumina áreas escuras"
+  },
+  {
+    "nome": "Kit de Perícia",
+    "categoria": 0,
+    "espaco": 1,
+    "descricao": "Ferramentas para perícias específicas"
+  },
+  {
+    "nome": "Cicatrizante",
+    "categoria": "I",
+    "espaco": 1,
+    "descricao": "Recupera PV"
+  },
+  {
+    "nome": "Algemas",
+    "categoria": 0,
+    "espaco": 1,
+    "descricao": "Para prender suspeitos"
+  },
+  {
+    "nome": "Corda (15m)",
+    "categoria": 0,
+    "espaco": 1,
+    "descricao": "Para escalar e amarrar"
+  },
+  {
+    "nome": "Mochila",
+    "categoria": 0,
+    "espaco": 0,
+    "descricao": "Aumenta capacidade de carga em +2"
+  },
+  {
+    "nome": "Binóculos",
+    "categoria": "I",
+    "espaco": 1,
+    "descricao": "Visão de longa distância"
+  }
+]

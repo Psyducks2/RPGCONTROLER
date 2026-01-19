@@ -1,0 +1,32 @@
+[
+  {
+    "nome": "Balas curtas",
+    "categoria": 0,
+    "espaco": 1,
+    "descricao": "Munição para pistolas e revólveres"
+  },
+  {
+    "nome": "Balas longas",
+    "categoria": "I",
+    "espaco": 1,
+    "descricao": "Munição para rifles"
+  },
+  {
+    "nome": "Cartuchos",
+    "categoria": "I",
+    "espaco": 1,
+    "descricao": "Munição para escopetas"
+  },
+  {
+    "nome": "Combustível",
+    "categoria": "I",
+    "espaco": 1,
+    "descricao": "Para armas de fogo"
+  },
+  {
+    "nome": "Flechas",
+    "categoria": 0,
+    "espaco": 1,
+    "descricao": "Para arcos"
+  }
+]

@@ -1,0 +1,142 @@
+[
+  {
+    "nome": "Acrobacia",
+    "atributo": "AGI",
+    "descricao": "Equilibrar-se, rolar, saltar e fazer movimentos acrobáticos"
+  },
+  {
+    "nome": "Adestramento",
+    "atributo": "PRE",
+    "descricao": "Treinar e comandar animais"
+  },
+  {
+    "nome": "Artes",
+    "atributo": "PRE",
+    "descricao": "Criar e avaliar trabalhos artísticos"
+  },
+  {
+    "nome": "Atletismo",
+    "atributo": "FOR",
+    "descricao": "Escalar, nadar, correr, saltar e outros esforços físicos"
+  },
+  {
+    "nome": "Atualidades",
+    "atributo": "INT",
+    "descricao": "Conhecimento sobre eventos recentes e cultura pop"
+  },
+  {
+    "nome": "Ciências",
+    "atributo": "INT",
+    "descricao": "Conhecimentos científicos gerais"
+  },
+  {
+    "nome": "Crime",
+    "atributo": "AGI",
+    "descricao": "Arrombar fechaduras, furtar e disfarçar-se"
+  },
+  {
+    "nome": "Diplomacia",
+    "atributo": "PRE",
+    "descricao": "Persuadir e negociar com outros"
+  },
+  {
+    "nome": "Enganação",
+    "atributo": "PRE",
+    "descricao": "Mentir e enganar convincentemente"
+  },
+  {
+    "nome": "Fortitude",
+    "atributo": "VIG",
+    "descricao": "Resistir a doenças, venenos e fadiga"
+  },
+  {
+    "nome": "Furtividade",
+    "atributo": "AGI",
+    "descricao": "Mover-se silenciosamente e esconder-se"
+  },
+  {
+    "nome": "Iniciativa",
+    "atributo": "AGI",
+    "descricao": "Agir rapidamente em situações de perigo"
+  },
+  {
+    "nome": "Intimidação",
+    "atributo": "PRE",
+    "descricao": "Assustar e ameaçar outras pessoas"
+  },
+  {
+    "nome": "Intuição",
+    "atributo": "PRE",
+    "descricao": "Detectar mentiras e intenções"
+  },
+  {
+    "nome": "Investigação",
+    "atributo": "INT",
+    "descricao": "Procurar pistas e analisar evidências"
+  },
+  {
+    "nome": "Luta",
+    "atributo": "FOR",
+    "descricao": "Lutar corpo a corpo desarmado"
+  },
+  {
+    "nome": "Medicina",
+    "atributo": "INT",
+    "descricao": "Tratar ferimentos e doenças"
+  },
+  {
+    "nome": "Ocultismo",
+    "atributo": "INT",
+    "descricao": "Conhecimento sobre o paranormal"
+  },
+  {
+    "nome": "Percepção",
+    "atributo": "PRE",
+    "descricao": "Notar detalhes e estar atento ao ambiente"
+  },
+  {
+    "nome": "Pilotagem",
+    "atributo": "AGI",
+    "descricao": "Dirigir e pilotar veículos"
+  },
+  {
+    "nome": "Pontaria",
+    "atributo": "AGI",
+    "descricao": "Atacar com armas de distância"
+  },
+  {
+    "nome": "Profissão",
+    "atributo": "INT",
+    "descricao": "Conhecimento sobre uma profissão específica"
+  },
+  {
+    "nome": "Reflexos",
+    "atributo": "AGI",
+    "descricao": "Esquivar-se de ataques e perigos"
+  },
+  {
+    "nome": "Religião",
+    "atributo": "PRE",
+    "descricao": "Conhecimento sobre religiões"
+  },
+  {
+    "nome": "Sobrevivência",
+    "atributo": "INT",
+    "descricao": "Sobreviver em ambientes selvagens"
+  },
+  {
+    "nome": "Tática",
+    "atributo": "INT",
+    "descricao": "Planejar estratégias de combate"
+  },
+  {
+    "nome": "Tecnologia",
+    "atributo": "INT",
+    "descricao": "Usar e consertar dispositivos tecnológicos"
+  },
+  {
+    "nome": "Vontade",
+    "atributo": "PRE",
+    "descricao": "Resistir a efeitos mentais e medo"
+  }
+]

@@ -1,0 +1,158 @@
+[
+  {
+    "id": "academico",
+    "nome": "Acadêmico",
+    "pericias": ["Ciências", "Investigação"],
+    "poderes": ["Mente Analítica"]
+  },
+  {
+    "id": "agente_saude",
+    "nome": "Agente de Saúde",
+    "pericias": ["Intuição", "Medicina"],
+    "poderes": ["Técnica Medicinal"]
+  },
+  {
+    "id": "amnésico",
+    "nome": "Amnésico",
+    "pericias": ["Duas a sua escolha de mestre"],
+    "poderes": ["Mente em Branco"]
+  },
+  {
+    "id": "artista",
+    "nome": "Artista",
+    "pericias": ["Artes", "Enganação"],
+    "poderes": ["Magnum Opus"]
+  },
+  {
+    "id": "atleta",
+    "nome": "Atleta",
+    "pericias": ["Acrobacia", "Atletismo"],
+    "poderes": ["Corpo Saudável"]
+  },
+  {
+    "id": "chef",
+    "nome": "Chef",
+    "pericias": ["Fortitude", "Profissão (cozinheiro)"],
+    "poderes": ["Ingrediente Secreto"]
+  },
+  {
+    "id": "criminoso",
+    "nome": "Criminoso",
+    "pericias": ["Crime", "Furtividade"],
+    "poderes": ["Ganha Conhecimento"]
+  },
+  {
+    "id": "cultista_arrependido",
+    "nome": "Cultista Arrependido",
+    "pericias": ["Ocultismo", "Religião"],
+    "poderes": ["Traços do Outro Lado"]
+  },
+  {
+    "id": "desgarrado",
+    "nome": "Desgarrado",
+    "pericias": ["Fortitude", "Sobrevivência"],
+    "poderes": ["Cicatrizes"]
+  },
+  {
+    "id": "engenheiro",
+    "nome": "Engenheiro",
+    "pericias": ["Profissão", "Tecnologia"],
+    "poderes": ["Ferramentas Favoritas"]
+  },
+  {
+    "id": "executivo",
+    "nome": "Executivo",
+    "pericias": ["Diplomacia", "Profissão"],
+    "poderes": ["Dinheiro Compra"]
+  },
+  {
+    "id": "investigador",
+    "nome": "Investigador",
+    "pericias": ["Investigação", "Percepção"],
+    "poderes": ["Faro para Pistas"]
+  },
+  {
+    "id": "lutador",
+    "nome": "Lutador",
+    "pericias": ["Luta", "Reflexos"],
+    "poderes": ["Mãos Letais"]
+  },
+  {
+    "id": "magnata",
+    "nome": "Magnata",
+    "pericias": ["Diplomacia", "Pilotagem"],
+    "poderes": ["Patrocinador da Ordem"]
+  },
+  {
+    "id": "mercenario",
+    "nome": "Mercenário",
+    "pericias": ["Intimidação", "Tática"],
+    "poderes": ["Dinheiro na Conta"]
+  },
+  {
+    "id": "militar",
+    "nome": "Militar",
+    "pericias": ["Pontaria", "Tática"],
+    "poderes": ["Para Bellum"]
+  },
+  {
+    "id": "operario",
+    "nome": "Operário",
+    "pericias": ["Fortitude", "Profissão"],
+    "poderes": ["Ferramentas de Trabalho"]
+  },
+  {
+    "id": "policial",
+    "nome": "Policial",
+    "pericias": ["Percepção", "Pontaria"],
+    "poderes": ["Patrulha"]
+  },
+  {
+    "id": "religioso",
+    "nome": "Religioso",
+    "pericias": ["Religião", "Vontade"],
+    "poderes": ["Fé"]
+  },
+  {
+    "id": "servidor_publico",
+    "nome": "Servidor Público",
+    "pericias": ["Intuição", "Vontade"],
+    "poderes": ["Espírito Cívico"]
+  },
+  {
+    "id": "teorico_conspiracao",
+    "nome": "Teórico da Conspiração",
+    "pericias": ["Investigação", "Ocultismo"],
+    "poderes": ["É Tudo Verdade"]
+  },
+  {
+    "id": "ti",
+    "nome": "T.I.",
+    "pericias": ["Investigação", "Tecnologia"],
+    "poderes": ["Motor de Busca"]
+  },
+  {
+    "id": "trabalhador_rural",
+    "nome": "Trabalhador Rural",
+    "pericias": ["Adestramento", "Sobrevivência"],
+    "poderes": ["Bem Adaptado"]
+  },
+  {
+    "id": "trambiqueiro",
+    "nome": "Trambiqueiro",
+    "pericias": ["Crime", "Enganação"],
+    "poderes": ["Impostor"]
+  },
+  {
+    "id": "universitario",
+    "nome": "Universitário",
+    "pericias": ["Atualidades", "Investigação"],
+    "poderes": ["Dedicado"]
+  },
+  {
+    "id": "vitima",
+    "nome": "Vítima",
+    "pericias": ["Reflexos", "Vontade"],
+    "poderes": ["Escapar Psicológico"]
+  }
+]

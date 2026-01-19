@@ -1,0 +1,45 @@
+{
+  "testes": [
+    {
+      "tipo": "Básico",
+      "DT": 5,
+      "descricao": "Ação extremamente fácil (sem rolagem necessária)"
+    },
+    {
+      "tipo": "Médio",
+      "DT": 15,
+      "descricao": "Ação com barreiras no caminho (Sobrevivência/Atletismo)"
+    },
+    {
+      "tipo": "Difícil",
+      "DT": 25,
+      "descricao": "Ação com acampamento no campo (Sobrevivência/Atletismo)"
+    },
+    {
+      "tipo": "Muito difícil",
+      "DT": 30,
+      "descricao": "Ação em sangramento (Medicina)"
+    },
+    {
+      "tipo": "Formidável",
+      "DT": 35,
+      "descricao": "Realizar um salvador de vida (Medicina)"
+    },
+    {
+      "tipo": "Heroica",
+      "DT": 40,
+      "descricao": "Decifrar um pergaminho ancestral (Ocultismo)"
+    },
+    {
+      "tipo": "Quase impossível",
+      "DT": 45,
+      "descricao": "Convencer alguém que não gosta de você"
+    }
+  ],
+  "circulos": {
+    "1": { "DT": 15 },
+    "2": { "DT": 20 },
+    "3": { "DT": 25 },
+    "4": { "DT": 30 }
+  }
+}
