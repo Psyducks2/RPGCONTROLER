@@ -1,12 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
 const app = express();
 const PORT = 3000;
@@ -14,18 +12,16 @@ const PORT = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Função auxiliar para ler arquivos JSON
-const readJSON = async (filename) => {
-  const filePath = path.join(__dirname, 'data', filename);
-  const data = await fs.readFile(filePath, 'utf-8');
-  return JSON.parse(data);
-};
+// Configuração do Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-// Função auxiliar para escrever arquivos JSON
-const writeJSON = async (filename, data) => {
-  const filePath = path.join(__dirname, 'data', filename);
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-};
+if (!supabaseUrl || !supabaseKey) {
+  console.error('\n⚠️  ATENÇÃO: SUPABASE_URL ou SUPABASE_ANON_KEY não configurados!');
+  console.error('Por favor, crie um arquivo .env com as credenciais do Supabase.\n');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ============ ROTAS DE DADOS ESTÁTICOS ============
 

@@ -1,37 +1,29 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { createClient } from '@supabase/supabase-js';
 
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
 
-// Função auxiliar para ler arquivos JSON
-const readJSON = async (filename) => {
-  const filePath = path.join(__dirname, '..', 'server', 'data', filename);
-  const data = await fs.readFile(filePath, 'utf-8');
-  return JSON.parse(data);
-};
+// Configuração do Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-// Função auxiliar para escrever arquivos JSON
-const writeJSON = async (filename, data) => {
-  const filePath = path.join(__dirname, '..', 'server', 'data', filename);
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-};
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ============ ROTAS DE DADOS ESTÁTICOS ============
 
 app.get('/api/origens', async (req, res) => {
   try {
-    const origens = await readJSON('origens.json');
-    res.json(origens);
+    const { data, error } = await supabase
+      .from('origens')
+      .select('*');
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar origens' });
   }
@@ -39,8 +31,13 @@ app.get('/api/origens', async (req, res) => {
 
 app.get('/api/pericias', async (req, res) => {
   try {
-    const pericias = await readJSON('pericias.json');
-    res.json(pericias);
+    const { data, error } = await supabase
+      .from('pericias')
+      .select('*')
+      .order('nome');
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar perícias' });
   }
@@ -48,8 +45,13 @@ app.get('/api/pericias', async (req, res) => {
 
 app.get('/api/armas', async (req, res) => {
   try {
-    const armas = await readJSON('armas.json');
-    res.json(armas);
+    const { data, error } = await supabase
+      .from('armas')
+      .select('*')
+      .order('nome');
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar armas' });
   }
@@ -57,8 +59,13 @@ app.get('/api/armas', async (req, res) => {
 
 app.get('/api/municoes', async (req, res) => {
   try {
-    const municoes = await readJSON('municoes.json');
-    res.json(municoes);
+    const { data, error } = await supabase
+      .from('municoes')
+      .select('*')
+      .order('nome');
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar munições' });
   }
@@ -66,8 +73,13 @@ app.get('/api/municoes', async (req, res) => {
 
 app.get('/api/protecoes', async (req, res) => {
   try {
-    const protecoes = await readJSON('protecoes.json');
-    res.json(protecoes);
+    const { data, error } = await supabase
+      .from('protecoes')
+      .select('*')
+      .order('nome');
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar proteções' });
   }
@@ -75,8 +87,13 @@ app.get('/api/protecoes', async (req, res) => {
 
 app.get('/api/equipamentos', async (req, res) => {
   try {
-    const equipamentos = await readJSON('equipamentos.json');
-    res.json(equipamentos);
+    const { data, error } = await supabase
+      .from('equipamentos')
+      .select('*')
+      .order('nome');
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar equipamentos' });
   }
@@ -84,8 +101,13 @@ app.get('/api/equipamentos', async (req, res) => {
 
 app.get('/api/rituais', async (req, res) => {
   try {
-    const rituais = await readJSON('rituais.json');
-    res.json(rituais);
+    const { data, error } = await supabase
+      .from('rituais')
+      .select('*')
+      .order('circulo', { ascending: true });
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar rituais' });
   }
@@ -93,8 +115,12 @@ app.get('/api/rituais', async (req, res) => {
 
 app.get('/api/insanidade', async (req, res) => {
   try {
-    const insanidade = await readJSON('insanidade.json');
-    res.json(insanidade);
+    const { data, error } = await supabase
+      .from('insanidade')
+      .select('*');
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar efeitos de insanidade' });
   }
@@ -102,8 +128,13 @@ app.get('/api/insanidade', async (req, res) => {
 
 app.get('/api/dificuldades', async (req, res) => {
   try {
-    const dificuldades = await readJSON('dificuldades.json');
-    res.json(dificuldades);
+    const { data, error } = await supabase
+      .from('dificuldades')
+      .select('*')
+      .order('dt');
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar dificuldades' });
   }
@@ -111,8 +142,13 @@ app.get('/api/dificuldades', async (req, res) => {
 
 app.get('/api/habilidades', async (req, res) => {
   try {
-    const habilidades = await readJSON('habilidades.json');
-    res.json(habilidades);
+    const { data, error } = await supabase
+      .from('habilidades')
+      .select('*')
+      .order('nome');
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar habilidades' });
   }
@@ -122,8 +158,13 @@ app.get('/api/habilidades', async (req, res) => {
 
 app.get('/api/characters', async (req, res) => {
   try {
-    const characters = await readJSON('characters.json');
-    res.json(characters);
+    const { data, error } = await supabase
+      .from('characters')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar personagens' });
   }
@@ -131,14 +172,20 @@ app.get('/api/characters', async (req, res) => {
 
 app.get('/api/characters/:id', async (req, res) => {
   try {
-    const characters = await readJSON('characters.json');
-    const character = characters.find(c => c.id === req.params.id);
+    const { data, error } = await supabase
+      .from('characters')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
     
-    if (!character) {
-      return res.status(404).json({ error: 'Personagem não encontrado' });
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({ error: 'Personagem não encontrado' });
+      }
+      throw error;
     }
     
-    res.json(character);
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao carregar personagem' });
   }
@@ -146,41 +193,37 @@ app.get('/api/characters/:id', async (req, res) => {
 
 app.post('/api/characters', async (req, res) => {
   try {
-    const characters = await readJSON('characters.json');
-    const newCharacter = {
-      id: Date.now().toString(),
-      ...req.body,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    const { data, error} = await supabase
+      .from('characters')
+      .insert([req.body])
+      .select()
+      .single();
     
-    characters.push(newCharacter);
-    await writeJSON('characters.json', characters);
-    
-    res.status(201).json(newCharacter);
+    if (error) throw error;
+    res.status(201).json(data);
   } catch (error) {
+    console.error('Erro ao criar personagem:', error);
     res.status(500).json({ error: 'Erro ao criar personagem' });
   }
 });
 
 app.put('/api/characters/:id', async (req, res) => {
   try {
-    const characters = await readJSON('characters.json');
-    const index = characters.findIndex(c => c.id === req.params.id);
+    const { data, error } = await supabase
+      .from('characters')
+      .update(req.body)
+      .eq('id', req.params.id)
+      .select()
+      .single();
     
-    if (index === -1) {
-      return res.status(404).json({ error: 'Personagem não encontrado' });
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({ error: 'Personagem não encontrado' });
+      }
+      throw error;
     }
     
-    characters[index] = {
-      ...characters[index],
-      ...req.body,
-      id: req.params.id,
-      updatedAt: new Date().toISOString()
-    };
-    
-    await writeJSON('characters.json', characters);
-    res.json(characters[index]);
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao atualizar personagem' });
   }
@@ -188,14 +231,12 @@ app.put('/api/characters/:id', async (req, res) => {
 
 app.delete('/api/characters/:id', async (req, res) => {
   try {
-    const characters = await readJSON('characters.json');
-    const filteredCharacters = characters.filter(c => c.id !== req.params.id);
+    const { error } = await supabase
+      .from('characters')
+      .delete()
+      .eq('id', req.params.id);
     
-    if (characters.length === filteredCharacters.length) {
-      return res.status(404).json({ error: 'Personagem não encontrado' });
-    }
-    
-    await writeJSON('characters.json', filteredCharacters);
+    if (error) throw error;
     res.json({ message: 'Personagem deletado com sucesso' });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao deletar personagem' });
@@ -207,20 +248,26 @@ app.delete('/api/characters/:id', async (req, res) => {
 app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const admin = await readJSON('admin.json');
     
-    if (username === admin.username && password === admin.password) {
-      res.json({ 
-        success: true, 
-        token: admin.token,
-        message: 'Login bem-sucedido' 
-      });
-    } else {
-      res.status(401).json({ 
+    const { data: admin, error } = await supabase
+      .from('admin')
+      .select('*')
+      .eq('username', username)
+      .eq('password', password)
+      .single();
+    
+    if (error || !admin) {
+      return res.status(401).json({ 
         success: false, 
         message: 'Credenciais inválidas' 
       });
     }
+    
+    res.json({ 
+      success: true, 
+      token: admin.token,
+      message: 'Login bem-sucedido' 
+    });
   } catch (error) {
     res.status(500).json({ error: 'Erro no login' });
   }
@@ -231,12 +278,17 @@ const authenticateAdmin = async (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
   
   try {
-    const admin = await readJSON('admin.json');
-    if (token === admin.token) {
-      next();
-    } else {
-      res.status(403).json({ error: 'Acesso negado' });
+    const { data: admin, error } = await supabase
+      .from('admin')
+      .select('*')
+      .eq('token', token)
+      .single();
+    
+    if (error || !admin) {
+      return res.status(403).json({ error: 'Acesso negado' });
     }
+    
+    next();
   } catch (error) {
     res.status(500).json({ error: 'Erro de autenticação' });
   }
@@ -246,149 +298,105 @@ const authenticateAdmin = async (req, res, next) => {
 
 app.post('/api/admin/habilidades', authenticateAdmin, async (req, res) => {
   try {
-    const habilidades = await readJSON('habilidades.json');
-    habilidades.push(req.body);
-    await writeJSON('habilidades.json', habilidades);
-    res.status(201).json(req.body);
+    const { data, error } = await supabase
+      .from('habilidades')
+      .insert([req.body])
+      .select()
+      .single();
+    
+    if (error) throw error;
+    res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao adicionar habilidade' });
   }
 });
 
-app.put('/api/admin/habilidades/:index', authenticateAdmin, async (req, res) => {
+app.put('/api/admin/habilidades/:id', authenticateAdmin, async (req, res) => {
   try {
-    const habilidades = await readJSON('habilidades.json');
-    const index = parseInt(req.params.index);
-    habilidades[index] = req.body;
-    await writeJSON('habilidades.json', habilidades);
-    res.json(req.body);
+    const { data, error } = await supabase
+      .from('habilidades')
+      .update(req.body)
+      .eq('id', req.params.id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao atualizar habilidade' });
   }
 });
 
-app.delete('/api/admin/habilidades/:index', authenticateAdmin, async (req, res) => {
+app.delete('/api/admin/habilidades/:id', authenticateAdmin, async (req, res) => {
   try {
-    const habilidades = await readJSON('habilidades.json');
-    const index = parseInt(req.params.index);
-    habilidades.splice(index, 1);
-    await writeJSON('habilidades.json', habilidades);
+    const { error } = await supabase
+      .from('habilidades')
+      .delete()
+      .eq('id', req.params.id);
+    
+    if (error) throw error;
     res.json({ message: 'Habilidade removida com sucesso' });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao remover habilidade' });
   }
 });
 
-// ============ ROTAS ADMIN - CRUD DE ARMAS ============
+// ============ ROTAS ADMIN - CRUD GENÉRICO ============
 
-app.post('/api/admin/armas', authenticateAdmin, async (req, res) => {
-  try {
-    const armas = await readJSON('armas.json');
-    armas.push(req.body);
-    await writeJSON('armas.json', armas);
-    res.status(201).json(req.body);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao adicionar arma' });
-  }
-});
+// Helper para CRUD de itens
+const createItemRoutes = (tableName, itemName) => {
+  app.post(`/api/admin/${tableName}`, authenticateAdmin, async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .from(tableName)
+        .insert([req.body])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error: `Erro ao adicionar ${itemName}` });
+    }
+  });
 
-app.put('/api/admin/armas/:index', authenticateAdmin, async (req, res) => {
-  try {
-    const armas = await readJSON('armas.json');
-    const index = parseInt(req.params.index);
-    armas[index] = req.body;
-    await writeJSON('armas.json', armas);
-    res.json(req.body);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao atualizar arma' });
-  }
-});
+  app.put(`/api/admin/${tableName}/:id`, authenticateAdmin, async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .from(tableName)
+        .update(req.body)
+        .eq('id', req.params.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: `Erro ao atualizar ${itemName}` });
+    }
+  });
 
-app.delete('/api/admin/armas/:index', authenticateAdmin, async (req, res) => {
-  try {
-    const armas = await readJSON('armas.json');
-    const index = parseInt(req.params.index);
-    armas.splice(index, 1);
-    await writeJSON('armas.json', armas);
-    res.json({ message: 'Arma removida com sucesso' });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao remover arma' });
-  }
-});
+  app.delete(`/api/admin/${tableName}/:id`, authenticateAdmin, async (req, res) => {
+    try {
+      const { error } = await supabase
+        .from(tableName)
+        .delete()
+        .eq('id', req.params.id);
+      
+      if (error) throw error;
+      res.json({ message: `${itemName} removido com sucesso` });
+    } catch (error) {
+      res.status(500).json({ error: `Erro ao remover ${itemName}` });
+    }
+  });
+};
 
-// ============ ROTAS ADMIN - CRUD DE RITUAIS ============
-
-app.post('/api/admin/rituais', authenticateAdmin, async (req, res) => {
-  try {
-    const rituais = await readJSON('rituais.json');
-    rituais.push(req.body);
-    await writeJSON('rituais.json', rituais);
-    res.status(201).json(req.body);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao adicionar ritual' });
-  }
-});
-
-app.put('/api/admin/rituais/:index', authenticateAdmin, async (req, res) => {
-  try {
-    const rituais = await readJSON('rituais.json');
-    const index = parseInt(req.params.index);
-    rituais[index] = req.body;
-    await writeJSON('rituais.json', rituais);
-    res.json(req.body);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao atualizar ritual' });
-  }
-});
-
-app.delete('/api/admin/rituais/:index', authenticateAdmin, async (req, res) => {
-  try {
-    const rituais = await readJSON('rituais.json');
-    const index = parseInt(req.params.index);
-    rituais.splice(index, 1);
-    await writeJSON('rituais.json', rituais);
-    res.json({ message: 'Ritual removido com sucesso' });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao remover ritual' });
-  }
-});
-
-// ============ ROTAS ADMIN - CRUD DE EQUIPAMENTOS ============
-
-app.post('/api/admin/equipamentos', authenticateAdmin, async (req, res) => {
-  try {
-    const equipamentos = await readJSON('equipamentos.json');
-    equipamentos.push(req.body);
-    await writeJSON('equipamentos.json', equipamentos);
-    res.status(201).json(req.body);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao adicionar equipamento' });
-  }
-});
-
-app.put('/api/admin/equipamentos/:index', authenticateAdmin, async (req, res) => {
-  try {
-    const equipamentos = await readJSON('equipamentos.json');
-    const index = parseInt(req.params.index);
-    equipamentos[index] = req.body;
-    await writeJSON('equipamentos.json', equipamentos);
-    res.json(req.body);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao atualizar equipamento' });
-  }
-});
-
-app.delete('/api/admin/equipamentos/:index', authenticateAdmin, async (req, res) => {
-  try {
-    const equipamentos = await readJSON('equipamentos.json');
-    const index = parseInt(req.params.index);
-    equipamentos.splice(index, 1);
-    await writeJSON('equipamentos.json', equipamentos);
-    res.json({ message: 'Equipamento removido com sucesso' });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao remover equipamento' });
-  }
-});
+// Criar rotas para cada tipo de item
+createItemRoutes('armas', 'Arma');
+createItemRoutes('rituais', 'Ritual');
+createItemRoutes('equipamentos', 'Equipamento');
+createItemRoutes('municoes', 'Munição');
+createItemRoutes('protecoes', 'Proteção');
 
 // ============ ROTA DE ROLAGEM DE DADOS ============
 
