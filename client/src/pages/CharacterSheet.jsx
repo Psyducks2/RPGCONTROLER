@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { rollAttribute, rollFormula } from '../utils/diceRoller';
@@ -20,12 +20,43 @@ function CharacterSheet() {
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [itemType, setItemType] = useState('arma');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const lastRollRef = useRef(null);
 
   useEffect(() => {
     loadCharacter();
     loadPericias();
     loadItems();
   }, [id]);
+
+  // Scroll automático para resultados quando uma nova rolagem é feita
+  useEffect(() => {
+    if (lastRoll && lastRollRef.current) {
+      setTimeout(() => {
+        lastRollRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 100);
+    }
+  }, [lastRoll]);
+
+  // Verificar se deve mostrar o botão de scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollButton(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    if (lastRollRef.current) {
+      lastRollRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   const calculateEspacoUsado = (inventario) => {
     if (!inventario || inventario.length === 0) return 0;
@@ -306,7 +337,7 @@ function CharacterSheet() {
       </div>
 
       {lastRoll && (
-        <div className="last-roll card">
+        <div className="last-roll card" ref={lastRollRef}>
           <h3>🎲 Última Rolagem</h3>
           <div className="roll-details">
             <div className="roll-type">{lastRoll.tipo}</div>
@@ -323,6 +354,17 @@ function CharacterSheet() {
             <div className="roll-time">{lastRoll.timestamp}</div>
           </div>
         </div>
+      )}
+
+      {/* Botão flutuante para voltar aos resultados */}
+      {showScrollButton && lastRoll && (
+        <button 
+          onClick={scrollToTop}
+          className="scroll-to-top-btn"
+          title="Ver resultado dos dados"
+        >
+          🎲
+        </button>
       )}
 
       <div className="sheet-grid">

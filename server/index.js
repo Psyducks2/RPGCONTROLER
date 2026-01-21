@@ -259,6 +259,21 @@ app.get('/api/habilidades', async (req, res) => {
   }
 });
 
+// Modificações
+app.get('/api/modificacoes', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('modificacoes')
+      .select('*')
+      .order('nome');
+    
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao carregar modificações' });
+  }
+});
+
 // ============ ROTAS DE PERSONAGENS ============
 
 // Listar todos os personagens
@@ -465,6 +480,7 @@ createItemRoutes('equipamentos', 'Equipamento');
 createItemRoutes('municoes', 'Munição');
 createItemRoutes('protecoes', 'Proteção');
 createItemRoutes('habilidades', 'Habilidade');
+createItemRoutes('modificacoes', 'Modificação');
 
 // ============ ROTA DE ROLAGEM DE DADOS ============
 

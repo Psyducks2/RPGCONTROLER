@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { rollDice, rollFormula } from '../utils/diceRoller';
 import './DiceRoller.css';
 
@@ -7,8 +7,36 @@ function DiceRoller() {
   const [sides, setSides] = useState(20);
   const [modifier, setModifier] = useState(0);
   const [results, setResults] = useState([]);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const resultsContainerRef = useRef(null);
+  const resultsHeaderRef = useRef(null);
 
   const commonDice = [4, 6, 8, 10, 12, 20, 100];
+
+  // Scroll automático para resultados quando uma nova rolagem é feita
+  const scrollToResults = () => {
+    setTimeout(() => {
+      if (resultsHeaderRef.current) {
+        resultsHeaderRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 100);
+  };
+
+  // Verificar se deve mostrar o botão de scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollButton(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleRoll = () => {
     const rolls = rollDice(quantity, sides);
@@ -28,6 +56,7 @@ function DiceRoller() {
     };
 
     setResults([result, ...results]);
+    scrollToResults();
   };
 
   const handleQuickRoll = (q, s) => {
@@ -47,6 +76,7 @@ function DiceRoller() {
     };
 
     setResults([result, ...results]);
+    scrollToResults();
   };
 
   const clearHistory = () => {
@@ -114,8 +144,8 @@ function DiceRoller() {
           </div>
         </div>
 
-        <div className="results-container">
-          <div className="results-header">
+        <div className="results-container" ref={resultsContainerRef}>
+          <div className="results-header" ref={resultsHeaderRef}>
             <h2>Histórico de Rolagens</h2>
             {results.length > 0 && (
               <button onClick={clearHistory} className="clear-button">
@@ -157,6 +187,17 @@ function DiceRoller() {
           )}
         </div>
       </div>
+
+      {/* Botão flutuante para voltar ao topo */}
+      {showScrollButton && (
+        <button 
+          onClick={scrollToTop}
+          className="scroll-to-top-btn"
+          title="Voltar ao topo"
+        >
+          ⬆️
+        </button>
+      )}
     </div>
   );
 }

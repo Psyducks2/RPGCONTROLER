@@ -1004,6 +1004,37 @@
   font-size: 1rem;
 }
 
+.scroll-to-top-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  border: 2px solid var(--accent-secondary);
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.scroll-to-top-btn:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(139, 0, 0, 0.5);
+}
+
+.scroll-to-top-btn:active {
+  transform: translateY(-2px);
+}
+
 @media (max-width: 768px) {
   .attributes-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -1054,5 +1085,13 @@
   .modal-item-details {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .scroll-to-top-btn {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
   }
 }

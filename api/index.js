@@ -154,6 +154,20 @@ app.get('/api/habilidades', async (req, res) => {
   }
 });
 
+app.get('/api/modificacoes', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('modificacoes')
+      .select('*')
+      .order('nome');
+    
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao carregar modificações' });
+  }
+});
+
 // ============ ROTAS DE PERSONAGENS ============
 
 app.get('/api/characters', async (req, res) => {
@@ -491,6 +505,7 @@ createItemRoutes('rituais', 'Ritual');
 createItemRoutes('equipamentos', 'Equipamento');
 createItemRoutes('municoes', 'Munição');
 createItemRoutes('protecoes', 'Proteção');
+createItemRoutes('modificacoes', 'Modificação');
 
 // ============ ROTA DE ROLAGEM DE DADOS ============
 

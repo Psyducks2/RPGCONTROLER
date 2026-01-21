@@ -27,6 +27,9 @@ export const api = {
 
   // Habilidades
   getHabilidades: () => axios.get(`${API_BASE}/habilidades`),
+
+  // Modificações
+  getModificacoes: () => axios.get(`${API_BASE}/modificacoes`),
 };
 
 export default api;
