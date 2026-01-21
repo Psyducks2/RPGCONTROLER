@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS characters (
   prestigio INTEGER DEFAULT 0,
   espaco_usado INTEGER DEFAULT 0,
   espaco_total INTEGER DEFAULT 10,
+  conhecimento INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

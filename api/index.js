@@ -197,7 +197,7 @@ const toSnakeCase = (str) => {
 };
 
 const convertCharacterToDB = (char) => {
-  return {
+  const dbChar = {
     nome: char.nome,
     jogador: char.jogador,
     origem: char.origem,
@@ -229,9 +229,15 @@ const convertCharacterToDB = (char) => {
     pe_atual: char.peAtual || char.pe_atual,
     prestigio: char.prestigio || char.prestigio || 0,
     espaco_usado: char.espacoUsado || char.espaco_usado || 0,
-    espaco_total: char.espacoTotal || char.espaco_total || 10,
-    conhecimento: char.conhecimento || char.conhecimento || 0
+    espaco_total: char.espacoTotal || char.espaco_total || 10
   };
+  
+  // Adicionar conhecimento apenas se existir (campo novo, pode não estar no banco ainda)
+  if (char.conhecimento !== undefined) {
+    dbChar.conhecimento = char.conhecimento || 0;
+  }
+  
+  return dbChar;
 };
 
 const convertCharacterFromDB = (char) => {
@@ -295,6 +301,14 @@ app.post('/api/characters', async (req, res) => {
 app.put('/api/characters/:id', async (req, res) => {
   try {
     const dbChar = convertCharacterToDB(req.body);
+    
+    // Remover campos undefined/null que podem causar problemas
+    Object.keys(dbChar).forEach(key => {
+      if (dbChar[key] === undefined) {
+        delete dbChar[key];
+      }
+    });
+    
     const { data, error } = await supabase
       .from('characters')
       .update(dbChar)
@@ -303,15 +317,30 @@ app.put('/api/characters/:id', async (req, res) => {
       .single();
     
     if (error) {
+      console.error('Erro do Supabase ao atualizar personagem:', error);
       if (error.code === 'PGRST116') {
         return res.status(404).json({ error: 'Personagem não encontrado' });
+      }
+      // Se for erro de coluna desconhecida, tentar novamente sem a coluna
+      if (error.message && error.message.includes('column') && error.message.includes('does not exist')) {
+        console.log('Coluna não existe, removendo conhecimento da atualização');
+        delete dbChar.conhecimento;
+        const { data: retryData, error: retryError } = await supabase
+          .from('characters')
+          .update(dbChar)
+          .eq('id', req.params.id)
+          .select()
+          .single();
+        if (retryError) throw retryError;
+        return res.json(convertCharacterFromDB(retryData));
       }
       throw error;
     }
     
     res.json(convertCharacterFromDB(data));
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao atualizar personagem' });
+    console.error('Erro ao atualizar personagem:', error);
+    res.status(500).json({ error: 'Erro ao atualizar personagem', details: error.message });
   }
 });
 
