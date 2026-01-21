@@ -735,27 +735,33 @@ function CharacterSheet() {
               {character.inventario.map((item, index) => (
                 <div key={index} className="inventory-item">
                   <div className="item-info">
-                    <span className="item-name">{item.nome || item}</span>
-                    {item.tipo && <span className="item-type">({item.tipo})</span>}
-                    {item.dano && <span className="item-dano">Dano: {item.dano}</span>}
+                    <div className="item-header">
+                      <span className="item-name">{item.nome || item}</span>
+                      {item.tipo && <span className="item-type">({item.tipo})</span>}
+                    </div>
+                    {item.dano && <span className="item-dano">⚔️ Dano: {item.dano}</span>}
                   </div>
                   <div className="item-controls">
-                    {item.quantidade > 1 && (
-                      <button 
-                        onClick={() => updateItemQuantity(index, -1)}
-                        className="btn-quantity"
-                      >
-                        -
-                      </button>
-                    )}
-                    {item.quantidade && <span className="item-qty">x{item.quantidade}</span>}
-                    <button 
-                      onClick={() => updateItemQuantity(index, 1)}
-                      className="btn-quantity"
-                    >
-                      +
-                    </button>
-                    {item.espaco && <span className="item-space">{item.espaco * (item.quantidade || 1)} espaço(s)</span>}
+                    <div className="item-controls-row">
+                      <div className="quantity-controls">
+                        {item.quantidade > 1 && (
+                          <button 
+                            onClick={() => updateItemQuantity(index, -1)}
+                            className="btn-quantity"
+                          >
+                            -
+                          </button>
+                        )}
+                        {item.quantidade && <span className="item-qty">x{item.quantidade}</span>}
+                        <button 
+                          onClick={() => updateItemQuantity(index, 1)}
+                          className="btn-quantity"
+                        >
+                          +
+                        </button>
+                      </div>
+                      {item.espaco && <span className="item-space">📦 {item.espaco * (item.quantidade || 1)} espaço(s)</span>}
+                    </div>
                     {item.tipo === 'arma' && (
                       <div className="weapon-actions">
                         <button 
@@ -775,6 +781,7 @@ function CharacterSheet() {
                     <button 
                       onClick={() => removeItemFromInventory(index)}
                       className="btn-remove-item"
+                      title="Remover item"
                     >
                       ✕
                     </button>

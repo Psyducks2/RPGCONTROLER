@@ -412,106 +412,174 @@
   text-align: center;
 }
 
-.inventory-item {
+.inventory-items {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.inventory-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 1rem;
   background: var(--bg-tertiary);
-  border-radius: 5px;
-  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
   border: 1px solid var(--border-color);
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  word-wrap: break-word;
+  position: relative;
 }
 
 .item-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  min-width: 0;
   flex: 1;
+  overflow: hidden;
+}
+
+.item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .item-name {
   font-weight: 600;
   color: var(--text-primary);
+  font-size: 1rem;
+  word-break: break-word;
 }
 
 .item-type {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
+  display: inline-block;
 }
 
 .item-dano {
   font-size: 0.9rem;
   color: var(--accent-secondary);
+  font-weight: 600;
+  display: inline-block;
 }
 
 .item-controls {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.item-controls-row {
+  display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .btn-quantity {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
   padding: 0;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: 4px;
   color: var(--text-primary);
   cursor: pointer;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .btn-quantity:hover {
   background: var(--accent-primary);
+  border-color: var(--accent-secondary);
 }
 
 .item-qty {
   padding: 0.25rem 0.5rem;
   background: var(--bg-secondary);
-  border-radius: 3px;
+  border-radius: 4px;
   font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .item-space {
   font-size: 0.85rem;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .weapon-actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .btn-attack, .btn-damage {
-  padding: 0.25rem 0.75rem;
+  padding: 0.4rem 0.75rem;
   background: var(--accent-primary);
   border: 1px solid var(--accent-secondary);
-  border-radius: 3px;
+  border-radius: 5px;
   color: var(--text-primary);
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .btn-attack:hover, .btn-damage:hover {
   background: var(--accent-secondary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(139, 0, 0, 0.3);
 }
 
 .btn-remove-item {
-  padding: 0.25rem 0.5rem;
+  padding: 0.4rem 0.6rem;
   background: var(--danger, #dc2626);
   border: none;
-  border-radius: 3px;
+  border-radius: 5px;
   color: white;
   cursor: pointer;
   font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
 }
 
 .btn-remove-item:hover {
   background: #b91c1c;
+  transform: scale(1.1);
 }
 
 /* Modal */
@@ -951,22 +1019,26 @@
   }
 
   .inventory-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
 
   .item-controls {
     width: 100%;
+    align-items: stretch;
+  }
+
+  .item-controls-row {
     justify-content: space-between;
+    width: 100%;
   }
 
   .weapon-actions {
-    flex-direction: column;
     width: 100%;
   }
 
   .weapon-actions button {
+    flex: 1;
     width: 100%;
   }
 
