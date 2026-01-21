@@ -116,6 +116,30 @@
   font-weight: 600;
 }
 
+.rituais-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.btn-add-ritual {
+  padding: 0.5rem 1rem;
+  background: var(--accent-primary);
+  border: 1px solid var(--accent-secondary);
+  color: var(--text-primary);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.btn-add-ritual:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-2px);
+}
+
 .rituais-list {
   display: flex;
   flex-direction: column;
@@ -123,17 +147,35 @@
 }
 
 .ritual-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
   padding: 1rem;
   background: var(--bg-tertiary);
-  border-radius: 5px;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.ritual-item:hover {
+  border-color: var(--accent-secondary);
+  box-shadow: 0 2px 8px rgba(139, 0, 0, 0.2);
+}
+
+.ritual-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .ritual-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .ritual-name {
@@ -142,18 +184,101 @@
   font-size: 1.1rem;
 }
 
+.ritual-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .ritual-circulo {
   background: var(--accent-primary);
   color: var(--text-primary);
   padding: 0.25rem 0.75rem;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 0.85rem;
   font-weight: 700;
+}
+
+.ritual-elemento {
+  background: rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(139, 92, 246, 0.5);
+}
+
+.ritual-desc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.ritual-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.ritual-details span {
+  padding: 0.2rem 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: 3px;
 }
 
 .ritual-info {
   color: var(--text-secondary);
   font-size: 0.9rem;
+}
+
+.btn-remove-ritual {
+  padding: 0.4rem 0.6rem;
+  background: var(--danger, #dc2626);
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  align-self: flex-start;
+}
+
+.btn-remove-ritual:hover {
+  background: #b91c1c;
+  transform: scale(1.1);
+}
+
+.modal-item.already-added {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(107, 114, 128, 0.2);
+}
+
+.detail-badge.circulo {
+  background: rgba(139, 0, 0, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(139, 0, 0, 0.3);
+}
+
+.detail-badge.elemento {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.detail-badge.already-badge {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .inventory-header {
@@ -209,6 +334,26 @@
   
   .combat-stats {
     grid-template-columns: 1fr;
+  }
+
+  .ritual-item {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .ritual-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rituais-header-section {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .btn-add-ritual {
+    width: 100%;
   }
   
   /* Estilos de inventário agora estão em CharacterSheet.css */

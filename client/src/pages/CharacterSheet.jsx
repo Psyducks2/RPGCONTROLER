@@ -21,13 +21,26 @@ function CharacterSheet() {
   const [itemType, setItemType] = useState('arma');
   const [searchTerm, setSearchTerm] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [rituais, setRituais] = useState([]);
+  const [showAddRitualModal, setShowAddRitualModal] = useState(false);
+  const [ritualSearchTerm, setRitualSearchTerm] = useState('');
   const lastRollRef = useRef(null);
 
   useEffect(() => {
     loadCharacter();
     loadPericias();
     loadItems();
+    loadRituais();
   }, [id]);
+
+  const loadRituais = async () => {
+    try {
+      const response = await api.getRituais();
+      setRituais(response.data);
+    } catch (err) {
+      console.error('Erro ao carregar rituais:', err);
+    }
+  };
 
   // Scroll automático para resultados quando uma nova rolagem é feita
   useEffect(() => {
@@ -309,6 +322,31 @@ function CharacterSheet() {
     const conhecimentoAtual = character.conhecimento || 0;
     const novoConhecimento = Math.max(0, conhecimentoAtual + change);
     updateCharacter({ conhecimento: novoConhecimento });
+  };
+
+  const addRitualToCharacter = (ritual) => {
+    const rituaisAtuais = character.rituaisConhecidos || [];
+    // Verificar se o ritual já existe
+    const jaExiste = rituaisAtuais.some(r => 
+      (typeof r === 'object' ? r.nome : r) === ritual.nome
+    );
+    
+    if (jaExiste) {
+      alert('Este ritual já está na lista!');
+      return;
+    }
+    
+    // Adicionar o ritual completo (objeto com todas as informações)
+    const novosRituais = [...rituaisAtuais, ritual];
+    updateCharacter({ rituaisConhecidos: novosRituais });
+    setShowAddRitualModal(false);
+    setRitualSearchTerm('');
+  };
+
+  const removeRitualFromCharacter = (index) => {
+    const rituaisAtuais = [...(character.rituaisConhecidos || [])];
+    rituaisAtuais.splice(index, 1);
+    updateCharacter({ rituaisConhecidos: rituaisAtuais });
   };
 
   if (loading) {
@@ -715,29 +753,141 @@ function CharacterSheet() {
 
         {/* Rituais */}
         <div className="card rituais-card">
-          <h2>Rituais Conhecidos</h2>
+          <div className="rituais-header-section">
+            <h2>Rituais Conhecidos</h2>
+            <button 
+              onClick={() => setShowAddRitualModal(true)}
+              className="btn-add-ritual"
+            >
+              + Adicionar Ritual
+            </button>
+          </div>
           {character.rituaisConhecidos && character.rituaisConhecidos.length > 0 ? (
             <div className="rituais-list">
-              {character.rituaisConhecidos.map((ritual, index) => (
-                <div key={index} className="ritual-item">
-                  <div className="ritual-header">
-                    <span className="ritual-name">{ritual.nome || ritual}</span>
-                    {ritual.circulo && (
-                      <span className="ritual-circulo">Círculo {ritual.circulo}</span>
-                    )}
-                  </div>
-                  {ritual.elemento && (
-                    <div className="ritual-info">
-                      <span>{ritual.elemento}</span>
+              {character.rituaisConhecidos.map((ritual, index) => {
+                const ritualObj = typeof ritual === 'object' ? ritual : { nome: ritual };
+                return (
+                  <div key={index} className="ritual-item">
+                    <div className="ritual-content">
+                      <div className="ritual-header">
+                        <span className="ritual-name">{ritualObj.nome || ritual}</span>
+                        <div className="ritual-badges">
+                          {ritualObj.circulo && (
+                            <span className="ritual-circulo">Círculo {ritualObj.circulo}</span>
+                          )}
+                          {ritualObj.elemento && (
+                            <span className="ritual-elemento">{ritualObj.elemento}</span>
+                          )}
+                        </div>
+                      </div>
+                      {ritualObj.descricao && (
+                        <div className="ritual-desc">{ritualObj.descricao}</div>
+                      )}
+                      {(ritualObj.execucao || ritualObj.alcance || ritualObj.alvo) && (
+                        <div className="ritual-details">
+                          {ritualObj.execucao && <span>Execução: {ritualObj.execucao}</span>}
+                          {ritualObj.alcance && <span>Alcance: {ritualObj.alcance}</span>}
+                          {ritualObj.alvo && <span>Alvo: {ritualObj.alvo}</span>}
+                          {ritualObj.duracao && <span>Duração: {ritualObj.duracao}</span>}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              ))}
+                    <button 
+                      onClick={() => removeRitualFromCharacter(index)}
+                      className="btn-remove-ritual"
+                      title="Remover ritual"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <p className="empty-text">Nenhum ritual conhecido</p>
+            <p className="empty-text">Nenhum ritual conhecido. Clique em "+ Adicionar Ritual" para começar!</p>
           )}
         </div>
+
+        {/* Modal de Adicionar Ritual */}
+        {showAddRitualModal && (
+          <div className="modal-overlay" onClick={() => {
+            setShowAddRitualModal(false);
+            setRitualSearchTerm('');
+          }}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>🔮 Adicionar Ritual</h3>
+                <button onClick={() => {
+                  setShowAddRitualModal(false);
+                  setRitualSearchTerm('');
+                }} className="btn-close-modal">✕</button>
+              </div>
+              <div className="modal-body">
+                <div className="modal-search">
+                  <input
+                    type="text"
+                    placeholder="🔍 Pesquisar rituais por nome..."
+                    value={ritualSearchTerm}
+                    onChange={(e) => setRitualSearchTerm(e.target.value)}
+                    className="modal-search-input"
+                  />
+                </div>
+
+                <div className="items-list-modal">
+                  {(() => {
+                    const filteredRituais = rituais.filter(ritual => 
+                      ritual.nome?.toLowerCase().includes(ritualSearchTerm.toLowerCase()) ||
+                      ritual.elemento?.toLowerCase().includes(ritualSearchTerm.toLowerCase()) ||
+                      ritual.descricao?.toLowerCase().includes(ritualSearchTerm.toLowerCase())
+                    );
+
+                    if (filteredRituais.length === 0) {
+                      return (
+                        <div className="no-items-found">
+                          <p>🔍 Nenhum ritual encontrado</p>
+                          {ritualSearchTerm && (
+                            <p className="search-hint">Tente pesquisar por outro nome</p>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    return filteredRituais.map((ritual) => {
+                      const jaConhecido = character.rituaisConhecidos?.some(r => 
+                        (typeof r === 'object' ? r.nome : r) === ritual.nome
+                      );
+                      const uniqueKey = ritual.id || ritual.nome;
+                      return (
+                        <div 
+                          key={uniqueKey} 
+                          className={`modal-item ${jaConhecido ? 'already-added' : ''}`}
+                          onClick={() => !jaConhecido && addRitualToCharacter(ritual)}
+                        >
+                          <div className="modal-item-header">
+                            <div className="modal-item-name">{ritual.nome}</div>
+                            {ritual.descricao && (
+                              <div className="modal-item-desc">{ritual.descricao}</div>
+                            )}
+                          </div>
+                          <div className="modal-item-details">
+                            <span className="detail-badge circulo">Círculo {ritual.circulo}</span>
+                            <span className="detail-badge elemento">{ritual.elemento}</span>
+                            {ritual.execucao && <span className="detail-badge">Execução: {ritual.execucao}</span>}
+                            {ritual.alcance && <span className="detail-badge">Alcance: {ritual.alcance}</span>}
+                            {ritual.alvo && <span className="detail-badge">Alvo: {ritual.alvo}</span>}
+                            {ritual.duracao && <span className="detail-badge">Duração: {ritual.duracao}</span>}
+                            {ritual.resistencia && <span className="detail-badge">Resistência: {ritual.resistencia}</span>}
+                            {jaConhecido && <span className="detail-badge already-badge">✓ Já Conhecido</span>}
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Inventário */}
         <div className="card inventory-card full-width">
