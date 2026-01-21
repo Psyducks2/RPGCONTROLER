@@ -24,6 +24,10 @@ function CharacterSheet() {
   const [rituais, setRituais] = useState([]);
   const [showAddRitualModal, setShowAddRitualModal] = useState(false);
   const [ritualSearchTerm, setRitualSearchTerm] = useState('');
+  const [modificacoes, setModificacoes] = useState([]);
+  const [showModifyWeaponModal, setShowModifyWeaponModal] = useState(false);
+  const [selectedWeaponIndex, setSelectedWeaponIndex] = useState(null);
+  const [modificacaoSearchTerm, setModificacaoSearchTerm] = useState('');
   const lastRollRef = useRef(null);
 
   useEffect(() => {
@@ -31,6 +35,7 @@ function CharacterSheet() {
     loadPericias();
     loadItems();
     loadRituais();
+    loadModificacoes();
   }, [id]);
 
   const loadRituais = async () => {
@@ -39,6 +44,15 @@ function CharacterSheet() {
       setRituais(response.data);
     } catch (err) {
       console.error('Erro ao carregar rituais:', err);
+    }
+  };
+
+  const loadModificacoes = async () => {
+    try {
+      const response = await api.getModificacoes();
+      setModificacoes(response.data || []);
+    } catch (err) {
+      console.error('Erro ao carregar modificações:', err);
     }
   };
 
@@ -74,8 +88,20 @@ function CharacterSheet() {
   const calculateEspacoUsado = (inventario) => {
     if (!inventario || inventario.length === 0) return 0;
     return inventario.reduce((total, item) => {
-      const espaco = item.espaco || 0;
+      let espaco = item.espaco || 0;
       const quantidade = item.quantidade || 1;
+      
+      // Verificar modificações que alteram espaço (ex: Discreta reduz em -1)
+      if (item.modificacoes && item.modificacoes.length > 0) {
+        item.modificacoes.forEach(mod => {
+          const modObj = typeof mod === 'object' ? mod : { nome: mod };
+          const efeito = modObj.efeito || '';
+          if (efeito.includes('Reduz espaço em 1')) {
+            espaco = Math.max(0, espaco - 1);
+          }
+        });
+      }
+      
       return total + (espaco * quantidade);
     }, 0);
   };
@@ -201,12 +227,13 @@ function CharacterSheet() {
     const inventarioAtual = character.inventario || [];
     const novoItem = {
       ...item,
-      tipo: tipo,
+      tipoItem: tipo, // Tipo do item (arma, equipamento, etc)
+      // Manter o tipo original da arma (Corpo a corpo, Arma de fogo) se existir
       quantidade: 1
     };
     
-    // Verificar se já existe o item (mesmo nome e tipo)
-    const itemIndex = inventarioAtual.findIndex(i => i.nome === item.nome && i.tipo === tipo);
+    // Verificar se já existe o item (mesmo nome e tipoItem)
+    const itemIndex = inventarioAtual.findIndex(i => i.nome === item.nome && i.tipoItem === tipo);
     if (itemIndex >= 0) {
       // Se existe, aumentar quantidade
       const novoInventario = [...inventarioAtual];
@@ -267,43 +294,97 @@ function CharacterSheet() {
   };
 
   const handleRollAttack = (arma) => {
-    const atributoRelevante = arma.tipo === 'Corpo a corpo' ? 'FOR' : 'AGI';
+    const tipoArma = arma.tipo || arma.tipoItem; // Tipo real da arma (Corpo a corpo ou Arma de fogo)
+    const atributoRelevante = tipoArma === 'Corpo a corpo' ? 'FOR' : 'AGI';
     const atributoValue = character.atributos[atributoRelevante] || 0;
     
     // Verificar se o personagem tem treinamento em Luta (corpo a corpo) ou Pontaria (armas de fogo)
-    const periciaNome = arma.tipo === 'Corpo a corpo' ? 'Luta' : 'Pontaria';
+    const periciaNome = tipoArma === 'Corpo a corpo' ? 'Luta' : 'Pontaria';
     const nivelTreinamento = character.pericias?.[periciaNome] || null;
     
     let skillBonus = 0;
-    if (nivelTreinamento === 'treinado') skillBonus = 5;
+    if (typeof nivelTreinamento === 'number') {
+      skillBonus = Math.min(5, Math.max(0, nivelTreinamento)) * 5;
+    } else if (nivelTreinamento === 'treinado') skillBonus = 5;
     else if (nivelTreinamento === 'veterano') skillBonus = 10;
     else if (nivelTreinamento === 'expert') skillBonus = 15;
     
-    const result = rollAttribute(atributoValue, skillBonus);
+    // Aplicar modificações que afetam ataque
+    let modificacaoBonus = 0;
+    if (arma.modificacoes && arma.modificacoes.length > 0) {
+      arma.modificacoes.forEach(mod => {
+        const modObj = typeof mod === 'object' ? mod : { nome: mod };
+        const efeito = modObj.efeito || '';
+        
+        // Certeira, Alongada: +2 em testes de ataque
+        if (efeito.includes('+2 em testes de ataque')) {
+          modificacaoBonus += 2;
+        }
+        // Mira Laser, Perigosa: +2 em margem de ameaça (será considerado separadamente)
+      });
+    }
+    
+    const result = rollAttribute(atributoValue, skillBonus + modificacaoBonus);
+    
+    // Calcular margem de ameaça considerando modificações
+    let margemAmeaca = arma.critico || '20';
+    if (arma.modificacoes && arma.modificacoes.length > 0) {
+      arma.modificacoes.forEach(mod => {
+        const modObj = typeof mod === 'object' ? mod : { nome: mod };
+        const efeito = modObj.efeito || '';
+        if (efeito.includes('+2 em margem de ameaça')) {
+          const criticoAtual = parseInt(margemAmeaca) || 20;
+          margemAmeaca = Math.max(2, criticoAtual - 2).toString();
+        }
+      });
+    }
+    
     setLastRoll({
       tipo: `Ataque com ${arma.nome} (${atributoRelevante})`,
       ...result,
       skillBonus,
+      modificacaoBonus,
       arma: arma.nome,
       dano: arma.dano,
+      margemAmeaca,
       timestamp: new Date().toLocaleTimeString()
     });
   };
 
   const handleRollDamage = (arma) => {
-    const atributoRelevante = arma.tipo === 'Corpo a corpo' ? 'FOR' : null;
+    const tipoArma = arma.tipo || arma.tipoItem; // Tipo real da arma
+    const atributoRelevante = tipoArma === 'Corpo a corpo' ? 'FOR' : null;
     const atributoValue = atributoRelevante ? character.atributos[atributoRelevante] || 0 : 0;
     
-    const result = rollFormula(arma.dano);
+    let danoModificado = arma.dano;
+    let modificacaoBonus = 0;
+    
+    // Aplicar modificações que afetam dano
+    if (arma.modificacoes && arma.modificacoes.length > 0) {
+      arma.modificacoes.forEach(mod => {
+        const modObj = typeof mod === 'object' ? mod : { nome: mod };
+        const efeito = modObj.efeito || '';
+        
+        // Cruel: +2 em rolagens de dano
+        if (efeito.includes('+2 em rolagens de dano')) {
+          modificacaoBonus += 2;
+        }
+        // Calibre Grosso: aumenta um dado (isso precisa ser calculado manualmente)
+        // Por enquanto, vamos apenas aplicar o bônus de Cruel
+      });
+    }
+    
+    const result = rollFormula(danoModificado);
     if (result) {
-      const total = result.total + atributoValue;
+      const total = result.total + atributoValue + modificacaoBonus;
       setLastRoll({
         tipo: `Dano com ${arma.nome}`,
         rolls: result.rolls,
         modifier: result.modifier,
         attributeValue: atributoValue,
+        modificacaoBonus,
         total: total,
-        dano: arma.dano,
+        dano: danoModificado,
         timestamp: new Date().toLocaleTimeString()
       });
     }
@@ -349,6 +430,135 @@ function CharacterSheet() {
     updateCharacter({ rituaisConhecidos: rituaisAtuais });
   };
 
+  const openModifyWeaponModal = (index) => {
+    setSelectedWeaponIndex(index);
+    setShowModifyWeaponModal(true);
+    setModificacaoSearchTerm('');
+  };
+
+  const addModificacaoToWeapon = (modificacao) => {
+    if (selectedWeaponIndex === null) return;
+    
+    const inventarioAtual = [...(character.inventario || [])];
+    const arma = inventarioAtual[selectedWeaponIndex];
+    
+    // Inicializar array de modificações se não existir
+    if (!arma.modificacoes) {
+      arma.modificacoes = [];
+    }
+    
+    // Verificar se a modificação já está aplicada
+    const jaAplicada = arma.modificacoes.some(m => 
+      (typeof m === 'object' ? m.nome : m) === modificacao.nome
+    );
+    
+    if (jaAplicada) {
+      alert('Esta modificação já está aplicada nesta arma!');
+      return;
+    }
+    
+    // Verificar se a modificação é compatível com o tipo de arma
+    const armaTipoReal = arma.tipo || ''; // Tipo real da arma (Corpo a corpo, Arma de fogo)
+    const modificacaoTipo = modificacao.tipo || '';
+    const modificacaoAplicacao = modificacao.aplicacao || '';
+    
+    // Validações básicas
+    if (modificacaoTipo === 'municao') {
+      alert('Esta modificação é apenas para munições!');
+      return;
+    }
+    
+    // Verificar compatibilidade baseada na aplicação
+    if (modificacaoAplicacao && modificacaoTipo === 'arma') {
+      // Verificar se é para armas de fogo
+      if (modificacaoAplicacao.includes('Armas de fogo') && armaTipoReal !== 'Arma de fogo') {
+        alert(`Esta modificação é apenas para: ${modificacaoAplicacao}`);
+        return;
+      }
+      // Verificar se é apenas para corpo a corpo (sem mencionar "e de disparo")
+      if (modificacaoAplicacao.includes('Corpo a corpo') && 
+          !modificacaoAplicacao.includes('e de disparo') && 
+          armaTipoReal !== 'Corpo a corpo') {
+        alert(`Esta modificação é apenas para: ${modificacaoAplicacao}`);
+        return;
+      }
+      // Verificar armas automáticas
+      if (modificacaoAplicacao.includes('armas automáticas') && armaTipoReal !== 'Arma de fogo') {
+        alert(`Esta modificação é apenas para: ${modificacaoAplicacao}`);
+        return;
+      }
+    }
+    
+    // Adicionar modificação
+    arma.modificacoes = [...arma.modificacoes, modificacao];
+    inventarioAtual[selectedWeaponIndex] = arma;
+    
+    // Recalcular espaço usado após adicionar modificação
+    const novoEspacoUsado = calculateEspacoUsado(inventarioAtual);
+    
+    updateCharacter({ 
+      inventario: inventarioAtual,
+      espacoUsado: novoEspacoUsado
+    });
+  };
+
+  const removeModificacaoFromWeapon = (weaponIndex, modificacaoIndex) => {
+    const inventarioAtual = [...(character.inventario || [])];
+    const arma = inventarioAtual[weaponIndex];
+    
+    if (arma.modificacoes && arma.modificacoes.length > 0) {
+      arma.modificacoes.splice(modificacaoIndex, 1);
+      inventarioAtual[weaponIndex] = arma;
+      
+      // Recalcular espaço usado após remover modificação
+      const novoEspacoUsado = calculateEspacoUsado(inventarioAtual);
+      
+      updateCharacter({ 
+        inventario: inventarioAtual,
+        espacoUsado: novoEspacoUsado
+      });
+    }
+  };
+
+  const getModificacoesForWeapon = (arma) => {
+    if (!arma || arma.tipoItem !== 'arma') return [];
+    
+    const armaTipoArma = arma.tipo || ''; // Tipo real da arma (ex: "Corpo a corpo" ou "Arma de fogo")
+    
+    return modificacoes.filter(mod => {
+      // Modificações de munição não se aplicam a armas diretamente
+      if (mod.tipo === 'municao') return false;
+      
+      // Verificar aplicação específica
+      const aplicacao = mod.aplicacao || '';
+      
+      // Se aplicação menciona "Corpo a corpo e de disparo", aplica a ambos
+      if (aplicacao.includes('Corpo a corpo e de disparo')) {
+        return true;
+      }
+      
+      // Se aplicação menciona "Armas de fogo", verificar se a arma é de fogo
+      if (aplicacao.includes('Armas de fogo')) {
+        return armaTipoArma === 'Arma de fogo';
+      }
+      
+      // Se aplicação menciona "Corpo a corpo", verificar se a arma é corpo a corpo
+      if (aplicacao.includes('Corpo a corpo')) {
+        return armaTipoArma === 'Corpo a corpo';
+      }
+      
+      // Se aplicação menciona "armas automáticas", precisa verificar a arma
+      if (aplicacao.includes('armas automáticas')) {
+        // Por enquanto, permitir para todas as armas de fogo
+        // (em um sistema completo, verificaria se a arma é automática)
+        return armaTipoArma === 'Arma de fogo';
+      }
+      
+      // Por padrão, modificações de tipo 'arma' se aplicam a todas as armas
+      return mod.tipo === 'arma';
+    });
+  };
+
   if (loading) {
     return <div className="loading">Carregando ficha</div>;
   }
@@ -383,6 +593,7 @@ function CharacterSheet() {
               <span>Dado: {lastRoll.roll}</span>
               <span>+ Atributo: {lastRoll.attributeValue}</span>
               {lastRoll.skillBonus > 0 && <span>+ Perícia: {lastRoll.skillBonus}</span>}
+              {lastRoll.modificacaoBonus > 0 && <span>+ Modificação: {lastRoll.modificacaoBonus}</span>}
             </div>
             <div className={`roll-total ${lastRoll.isCritical ? 'critical' : ''} ${lastRoll.isFumble ? 'fumble' : ''}`}>
               Total: {lastRoll.total}
@@ -929,9 +1140,37 @@ function CharacterSheet() {
                   <div className="item-info">
                     <div className="item-header">
                       <span className="item-name">{item.nome || item}</span>
-                      {item.tipo && <span className="item-type">({item.tipo})</span>}
+                      {item.tipoItem && <span className="item-type">({item.tipoItem})</span>}
                     </div>
                     {item.dano && <span className="item-dano">⚔️ Dano: {item.dano}</span>}
+                    {item.modificacoes && item.modificacoes.length > 0 && (
+                      <div className="weapon-modifications">
+                        <span className="modifications-label">Modificações:</span>
+                        <div className="modifications-list">
+                          {item.modificacoes.map((mod, modIndex) => {
+                            const modObj = typeof mod === 'object' ? mod : { nome: mod };
+                            return (
+                              <span 
+                                key={modIndex} 
+                                className="modification-badge"
+                                title={modObj.descricao || modObj.efeito || ''}
+                              >
+                                {modObj.nome}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeModificacaoFromWeapon(index, modIndex);
+                                  }}
+                                  className="btn-remove-modification"
+                                >
+                                  ✕
+                                </button>
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="item-controls">
                     <div className="item-controls-row">
@@ -952,23 +1191,45 @@ function CharacterSheet() {
                           +
                         </button>
                       </div>
-                      {item.espaco && <span className="item-space">📦 {item.espaco * (item.quantidade || 1)} espaço(s)</span>}
+                      {item.espaco && (() => {
+                        let espacoItem = item.espaco || 0;
+                        // Verificar se há modificação Discreta que reduz espaço
+                        if (item.modificacoes && item.modificacoes.length > 0) {
+                          item.modificacoes.forEach(mod => {
+                            const modObj = typeof mod === 'object' ? mod : { nome: mod };
+                            const efeito = modObj.efeito || '';
+                            if (efeito.includes('Reduz espaço em 1')) {
+                              espacoItem = Math.max(0, espacoItem - 1);
+                            }
+                          });
+                        }
+                        return <span className="item-space">📦 {espacoItem * (item.quantidade || 1)} espaço(s)</span>;
+                      })()}
                     </div>
-                    {item.tipo === 'arma' && (
-                      <div className="weapon-actions">
-                        <button 
-                          onClick={() => handleRollAttack(item)}
-                          className="btn-attack"
-                        >
-                          🎯 Atacar
-                        </button>
-                        <button 
-                          onClick={() => handleRollDamage(item)}
-                          className="btn-damage"
-                        >
-                          ⚔️ Dano
-                        </button>
-                      </div>
+                    {item.tipoItem === 'arma' && (
+                      <>
+                        <div className="weapon-actions">
+                          <button 
+                            onClick={() => handleRollAttack(item)}
+                            className="btn-attack"
+                          >
+                            🎯 Atacar
+                          </button>
+                          <button 
+                            onClick={() => handleRollDamage(item)}
+                            className="btn-damage"
+                          >
+                            ⚔️ Dano
+                          </button>
+                          <button 
+                            onClick={() => openModifyWeaponModal(index)}
+                            className="btn-modify"
+                            title="Adicionar modificações"
+                          >
+                            ⚙️ Modificar
+                          </button>
+                        </div>
+                      </>
                     )}
                     <button 
                       onClick={() => removeItemFromInventory(index)}
@@ -1095,6 +1356,95 @@ function CharacterSheet() {
                             {item.alcance && <span className="detail-badge alcance">📏 Alcance: {item.alcance}</span>}
                             <span className="detail-badge space">📦 Espaço: {item.espaco || 0}</span>
                             {item.categoria && <span className="detail-badge categoria">🏷️ Cat: {item.categoria}</span>}
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Modificar Arma */}
+        {showModifyWeaponModal && selectedWeaponIndex !== null && (
+          <div className="modal-overlay" onClick={() => {
+            setShowModifyWeaponModal(false);
+            setSelectedWeaponIndex(null);
+            setModificacaoSearchTerm('');
+          }}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>⚙️ Modificar Arma: {character.inventario[selectedWeaponIndex]?.nome}</h3>
+                <button onClick={() => {
+                  setShowModifyWeaponModal(false);
+                  setSelectedWeaponIndex(null);
+                  setModificacaoSearchTerm('');
+                }} className="btn-close-modal">✕</button>
+              </div>
+              <div className="modal-body">
+                <div className="modal-search">
+                  <input
+                    type="text"
+                    placeholder="🔍 Pesquisar modificações por nome..."
+                    value={modificacaoSearchTerm}
+                    onChange={(e) => setModificacaoSearchTerm(e.target.value)}
+                    className="modal-search-input"
+                  />
+                </div>
+
+                <div className="items-list-modal">
+                  {(() => {
+                    const arma = character.inventario[selectedWeaponIndex];
+                    if (!arma) return null;
+
+                    const modificacoesDisponiveis = getModificacoesForWeapon(arma);
+                    const modificacoesAplicadas = arma.modificacoes || [];
+                    
+                    const filteredMods = modificacoesDisponiveis.filter(mod => 
+                      mod.nome?.toLowerCase().includes(modificacaoSearchTerm.toLowerCase()) ||
+                      mod.efeito?.toLowerCase().includes(modificacaoSearchTerm.toLowerCase()) ||
+                      mod.descricao?.toLowerCase().includes(modificacaoSearchTerm.toLowerCase())
+                    );
+
+                    if (filteredMods.length === 0) {
+                      return (
+                        <div className="no-items-found">
+                          <p>🔍 Nenhuma modificação encontrada</p>
+                          {modificacaoSearchTerm && (
+                            <p className="search-hint">Tente pesquisar por outro nome</p>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    return filteredMods.map((modificacao) => {
+                      const jaAplicada = modificacoesAplicadas.some(m => 
+                        (typeof m === 'object' ? m.nome : m) === modificacao.nome
+                      );
+                      const uniqueKey = modificacao.id || modificacao.nome;
+                      return (
+                        <div 
+                          key={uniqueKey} 
+                          className={`modal-item ${jaAplicada ? 'already-added' : ''}`}
+                          onClick={() => !jaAplicada && addModificacaoToWeapon(modificacao)}
+                        >
+                          <div className="modal-item-header">
+                            <div className="modal-item-name">{modificacao.nome}</div>
+                            {modificacao.descricao && (
+                              <div className="modal-item-desc">{modificacao.descricao}</div>
+                            )}
+                          </div>
+                          <div className="modal-item-details">
+                            <span className={`detail-badge ${modificacao.tipo === 'arma' ? 'arma' : 'municao'}`}>
+                              {modificacao.tipo === 'arma' ? '⚔️ Arma' : '🔫 Munição'}
+                            </span>
+                            {modificacao.aplicacao && (
+                              <span className="detail-badge aplicacao">📋 {modificacao.aplicacao}</span>
+                            )}
+                            <span className="detail-badge efeito">✨ {modificacao.efeito}</span>
+                            {jaAplicada && <span className="detail-badge already-badge">✓ Já Aplicada</span>}
                           </div>
                         </div>
                       );
