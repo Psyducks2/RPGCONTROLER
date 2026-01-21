@@ -19,6 +19,7 @@ function CharacterSheet() {
   const [protecoes, setProtecoes] = useState([]);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [itemType, setItemType] = useState('arma');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     loadCharacter();
@@ -35,6 +36,19 @@ function CharacterSheet() {
     }, 0);
   };
 
+  // Função para remover duplicatas por nome
+  const removeDuplicates = (items) => {
+    const seen = new Set();
+    return items.filter(item => {
+      const nome = item.nome || item.id?.toString();
+      if (seen.has(nome)) {
+        return false;
+      }
+      seen.add(nome);
+      return true;
+    });
+  };
+
   const loadItems = async () => {
     try {
       const [armasRes, equipamentosRes, municoesRes, protecoesRes] = await Promise.all([
@@ -43,10 +57,11 @@ function CharacterSheet() {
         api.getMunicoes(),
         api.getProtecoes()
       ]);
-      setArmas(armasRes.data);
-      setEquipamentos(equipamentosRes.data);
-      setMunicoes(municoesRes.data);
-      setProtecoes(protecoesRes.data);
+      // Remover duplicatas
+      setArmas(removeDuplicates(armasRes.data || []));
+      setEquipamentos(removeDuplicates(equipamentosRes.data || []));
+      setMunicoes(removeDuplicates(municoesRes.data || []));
+      setProtecoes(removeDuplicates(protecoesRes.data || []));
     } catch (err) {
       console.error('Erro ao carregar itens:', err);
     }
@@ -774,90 +789,118 @@ function CharacterSheet() {
 
         {/* Modal de Adicionar Item */}
         {showAddItemModal && (
-          <div className="modal-overlay" onClick={() => setShowAddItemModal(false)}>
+          <div className="modal-overlay" onClick={() => {
+            setShowAddItemModal(false);
+            setSearchTerm('');
+          }}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h3>Adicionar Item ao Inventário</h3>
-                <button onClick={() => setShowAddItemModal(false)} className="btn-close-modal">✕</button>
+                <h3>🎒 Adicionar Item ao Inventário</h3>
+                <button onClick={() => {
+                  setShowAddItemModal(false);
+                  setSearchTerm('');
+                }} className="btn-close-modal">✕</button>
               </div>
               <div className="modal-body">
                 <div className="item-type-selector">
                   <button 
                     className={itemType === 'arma' ? 'active' : ''}
-                    onClick={() => setItemType('arma')}
+                    onClick={() => {
+                      setItemType('arma');
+                      setSearchTerm('');
+                    }}
                   >
                     ⚔️ Armas
                   </button>
                   <button 
                     className={itemType === 'equipamento' ? 'active' : ''}
-                    onClick={() => setItemType('equipamento')}
+                    onClick={() => {
+                      setItemType('equipamento');
+                      setSearchTerm('');
+                    }}
                   >
                     🎒 Equipamentos
                   </button>
                   <button 
                     className={itemType === 'municao' ? 'active' : ''}
-                    onClick={() => setItemType('municao')}
+                    onClick={() => {
+                      setItemType('municao');
+                      setSearchTerm('');
+                    }}
                   >
                     🔫 Munições
                   </button>
                   <button 
                     className={itemType === 'protecao' ? 'active' : ''}
-                    onClick={() => setItemType('protecao')}
+                    onClick={() => {
+                      setItemType('protecao');
+                      setSearchTerm('');
+                    }}
                   >
                     🛡️ Proteções
                   </button>
                 </div>
+                
+                <div className="modal-search">
+                  <input
+                    type="text"
+                    placeholder="🔍 Pesquisar por nome..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="modal-search-input"
+                  />
+                </div>
+
                 <div className="items-list-modal">
-                  {itemType === 'arma' && armas.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className="modal-item"
-                      onClick={() => addItemToInventory(item, 'arma')}
-                    >
-                      <div className="modal-item-name">{item.nome}</div>
-                      <div className="modal-item-details">
-                        <span>Dano: {item.dano}</span>
-                        <span>Espaço: {item.espaco}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {itemType === 'equipamento' && equipamentos.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className="modal-item"
-                      onClick={() => addItemToInventory(item, 'equipamento')}
-                    >
-                      <div className="modal-item-name">{item.nome}</div>
-                      <div className="modal-item-details">
-                        <span>Espaço: {item.espaco}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {itemType === 'municao' && municoes.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className="modal-item"
-                      onClick={() => addItemToInventory(item, 'municao')}
-                    >
-                      <div className="modal-item-name">{item.nome}</div>
-                      <div className="modal-item-details">
-                        <span>Espaço: {item.espaco}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {itemType === 'protecao' && protecoes.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className="modal-item"
-                      onClick={() => addItemToInventory(item, 'protecao')}
-                    >
-                      <div className="modal-item-name">{item.nome}</div>
-                      <div className="modal-item-details">
-                        <span>Defesa: +{item.defesa}</span>
-                        <span>Espaço: {item.espaco}</span>
-                      </div>
-                    </div>
-                  ))}
+                  {(() => {
+                    let items = [];
+                    if (itemType === 'arma') items = armas;
+                    else if (itemType === 'equipamento') items = equipamentos;
+                    else if (itemType === 'municao') items = municoes;
+                    else if (itemType === 'protecao') items = protecoes;
+
+                    // Filtrar por termo de busca
+                    const filteredItems = items.filter(item => 
+                      item.nome?.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+
+                    if (filteredItems.length === 0) {
+                      return (
+                        <div className="no-items-found">
+                          <p>🔍 Nenhum item encontrado</p>
+                          {searchTerm && (
+                            <p className="search-hint">Tente pesquisar por outro nome</p>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    return filteredItems.map((item) => {
+                      const uniqueKey = item.id || item.nome || `${itemType}-${item.nome}`;
+                      return (
+                        <div 
+                          key={uniqueKey} 
+                          className="modal-item"
+                          onClick={() => addItemToInventory(item, itemType)}
+                        >
+                          <div className="modal-item-header">
+                            <div className="modal-item-name">{item.nome}</div>
+                            {item.descricao && (
+                              <div className="modal-item-desc">{item.descricao}</div>
+                            )}
+                          </div>
+                          <div className="modal-item-details">
+                            {item.dano && <span className="detail-badge damage">⚔️ Dano: {item.dano}</span>}
+                            {item.defesa && <span className="detail-badge defense">🛡️ Defesa: +{item.defesa}</span>}
+                            {item.critico && <span className="detail-badge critico">💥 Crítico: {item.critico}</span>}
+                            {item.alcance && <span className="detail-badge alcance">📏 Alcance: {item.alcance}</span>}
+                            <span className="detail-badge space">📦 Espaço: {item.espaco || 0}</span>
+                            {item.categoria && <span className="detail-badge categoria">🏷️ Cat: {item.categoria}</span>}
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             </div>
