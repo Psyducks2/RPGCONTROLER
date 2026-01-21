@@ -229,7 +229,8 @@ const convertCharacterToDB = (char) => {
     pe_atual: char.peAtual || char.pe_atual,
     prestigio: char.prestigio || char.prestigio || 0,
     espaco_usado: char.espacoUsado || char.espaco_usado || 0,
-    espaco_total: char.espacoTotal || char.espaco_total || 10
+    espaco_total: char.espacoTotal || char.espaco_total || 10,
+    conhecimento: char.conhecimento || char.conhecimento || 0
   };
 };
 
@@ -268,6 +269,7 @@ const convertCharacterFromDB = (char) => {
     prestigio: char.prestigio || 0,
     espacoUsado: char.espaco_usado || 0,
     espacoTotal: char.espaco_total || 10,
+    conhecimento: char.conhecimento || 0,
     createdAt: char.created_at,
     updatedAt: char.updated_at
   };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
-import { rollAttribute } from '../utils/diceRoller';
+import { rollAttribute, rollFormula } from '../utils/diceRoller';
 import './CharacterSheet.css';
 import './CharacterSheetAdditions.css';
 
@@ -13,16 +13,54 @@ function CharacterSheet() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [lastRoll, setLastRoll] = useState(null);
+  const [armas, setArmas] = useState([]);
+  const [equipamentos, setEquipamentos] = useState([]);
+  const [municoes, setMunicoes] = useState([]);
+  const [protecoes, setProtecoes] = useState([]);
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [itemType, setItemType] = useState('arma');
 
   useEffect(() => {
     loadCharacter();
     loadPericias();
+    loadItems();
   }, [id]);
+
+  const calculateEspacoUsado = (inventario) => {
+    if (!inventario || inventario.length === 0) return 0;
+    return inventario.reduce((total, item) => {
+      const espaco = item.espaco || 0;
+      const quantidade = item.quantidade || 1;
+      return total + (espaco * quantidade);
+    }, 0);
+  };
+
+  const loadItems = async () => {
+    try {
+      const [armasRes, equipamentosRes, municoesRes, protecoesRes] = await Promise.all([
+        api.getArmas(),
+        api.getEquipamentos(),
+        api.getMunicoes(),
+        api.getProtecoes()
+      ]);
+      setArmas(armasRes.data);
+      setEquipamentos(equipamentosRes.data);
+      setMunicoes(municoesRes.data);
+      setProtecoes(protecoesRes.data);
+    } catch (err) {
+      console.error('Erro ao carregar itens:', err);
+    }
+  };
 
   const loadCharacter = async () => {
     try {
       const response = await api.getCharacter(id);
-      setCharacter(response.data);
+      const char = response.data;
+      // Calcular espaço usado se não estiver definido
+      if (!char.espacoUsado || char.espacoUsado === 0) {
+        char.espacoUsado = calculateEspacoUsado(char.inventario || []);
+      }
+      setCharacter(char);
     } catch (err) {
       console.error('Erro ao carregar personagem:', err);
       navigate('/characters');
@@ -65,18 +103,20 @@ function CharacterSheet() {
 
   const handleRollPericia = (pericia) => {
     const periciaData = pericias.find(p => p.nome === pericia.nome);
-    const atributoValue = character.atributos[periciaData.atributo] || 0;
+    const atributoValue = character.atributos[periciaData?.atributo] || 0;
     const nivelTreinamento = character.pericias?.[pericia.nome] || null;
     
     // Calcular bônus baseado no nível de treinamento
     let skillBonus = 0;
-    if (nivelTreinamento === 'treinado') skillBonus = 5;
+    if (typeof nivelTreinamento === 'number') {
+      skillBonus = Math.min(5, Math.max(0, nivelTreinamento)) * 5; // Cada nível = +5, máximo 5
+    } else if (nivelTreinamento === 'treinado') skillBonus = 5;
     else if (nivelTreinamento === 'veterano') skillBonus = 10;
     else if (nivelTreinamento === 'expert') skillBonus = 15;
     
     const result = rollAttribute(atributoValue, skillBonus);
     setLastRoll({
-      tipo: `Teste de ${pericia.nome} (${periciaData.atributo})`,
+      tipo: `Teste de ${pericia.nome} (${periciaData?.atributo || 'N/A'})`,
       ...result,
       skillBonus,
       timestamp: new Date().toLocaleTimeString()
@@ -96,6 +136,133 @@ function CharacterSheet() {
   const adjustPE = (amount) => {
     const newPE = Math.max(0, Math.min(character.peMax, character.peAtual + amount));
     updateCharacter({ peAtual: newPE });
+  };
+
+  const addItemToInventory = (item, tipo) => {
+    const inventarioAtual = character.inventario || [];
+    const novoItem = {
+      ...item,
+      tipo: tipo,
+      quantidade: 1
+    };
+    
+    // Verificar se já existe o item (mesmo nome e tipo)
+    const itemIndex = inventarioAtual.findIndex(i => i.nome === item.nome && i.tipo === tipo);
+    if (itemIndex >= 0) {
+      // Se existe, aumentar quantidade
+      const novoInventario = [...inventarioAtual];
+      novoInventario[itemIndex].quantidade = (novoInventario[itemIndex].quantidade || 1) + 1;
+      const novoEspacoUsado = calculateEspacoUsado(novoInventario);
+      
+      if (novoEspacoUsado <= (character.espacoTotal || 10)) {
+        updateCharacter({ 
+          inventario: novoInventario,
+          espacoUsado: novoEspacoUsado
+        });
+      } else {
+        alert('Não há espaço suficiente no inventário!');
+      }
+    } else {
+      // Se não existe, adicionar novo
+      const novoInventario = [...inventarioAtual, novoItem];
+      const novoEspacoUsado = calculateEspacoUsado(novoInventario);
+      
+      if (novoEspacoUsado <= (character.espacoTotal || 10)) {
+        updateCharacter({ 
+          inventario: novoInventario,
+          espacoUsado: novoEspacoUsado
+        });
+      } else {
+        alert('Não há espaço suficiente no inventário!');
+      }
+    }
+    setShowAddItemModal(false);
+  };
+
+  const removeItemFromInventory = (index) => {
+    const inventarioAtual = [...(character.inventario || [])];
+    inventarioAtual.splice(index, 1);
+    const novoEspacoUsado = calculateEspacoUsado(inventarioAtual);
+    updateCharacter({ 
+      inventario: inventarioAtual,
+      espacoUsado: novoEspacoUsado
+    });
+  };
+
+  const updateItemQuantity = (index, change) => {
+    const inventarioAtual = [...(character.inventario || [])];
+    const item = inventarioAtual[index];
+    const novaQuantidade = Math.max(1, (item.quantidade || 1) + change);
+    
+    inventarioAtual[index] = { ...item, quantidade: novaQuantidade };
+    const novoEspacoUsado = calculateEspacoUsado(inventarioAtual);
+    
+    if (novoEspacoUsado <= (character.espacoTotal || 10)) {
+      updateCharacter({ 
+        inventario: inventarioAtual,
+        espacoUsado: novoEspacoUsado
+      });
+    } else {
+      alert('Não há espaço suficiente no inventário!');
+    }
+  };
+
+  const handleRollAttack = (arma) => {
+    const atributoRelevante = arma.tipo === 'Corpo a corpo' ? 'FOR' : 'AGI';
+    const atributoValue = character.atributos[atributoRelevante] || 0;
+    
+    // Verificar se o personagem tem treinamento em Luta (corpo a corpo) ou Pontaria (armas de fogo)
+    const periciaNome = arma.tipo === 'Corpo a corpo' ? 'Luta' : 'Pontaria';
+    const nivelTreinamento = character.pericias?.[periciaNome] || null;
+    
+    let skillBonus = 0;
+    if (nivelTreinamento === 'treinado') skillBonus = 5;
+    else if (nivelTreinamento === 'veterano') skillBonus = 10;
+    else if (nivelTreinamento === 'expert') skillBonus = 15;
+    
+    const result = rollAttribute(atributoValue, skillBonus);
+    setLastRoll({
+      tipo: `Ataque com ${arma.nome} (${atributoRelevante})`,
+      ...result,
+      skillBonus,
+      arma: arma.nome,
+      dano: arma.dano,
+      timestamp: new Date().toLocaleTimeString()
+    });
+  };
+
+  const handleRollDamage = (arma) => {
+    const atributoRelevante = arma.tipo === 'Corpo a corpo' ? 'FOR' : null;
+    const atributoValue = atributoRelevante ? character.atributos[atributoRelevante] || 0 : 0;
+    
+    const result = rollFormula(arma.dano);
+    if (result) {
+      const total = result.total + atributoValue;
+      setLastRoll({
+        tipo: `Dano com ${arma.nome}`,
+        rolls: result.rolls,
+        modifier: result.modifier,
+        attributeValue: atributoValue,
+        total: total,
+        dano: arma.dano,
+        timestamp: new Date().toLocaleTimeString()
+      });
+    }
+  };
+
+  const updateEspacoTotal = (newEspacoTotal) => {
+    const espacoAtual = character.espacoUsado || 0;
+    if (espacoAtual <= newEspacoTotal) {
+      updateCharacter({ espacoTotal: newEspacoTotal });
+    } else {
+      alert('O espaço usado atual é maior que o novo espaço total!');
+    }
+  };
+
+  const updateConhecimento = (change) => {
+    const conhecimentoAtual = character.conhecimento || 0;
+    const novoConhecimento = Math.max(0, conhecimentoAtual + change);
+    updateCharacter({ conhecimento: novoConhecimento });
   };
 
   if (loading) {
@@ -284,40 +451,134 @@ function CharacterSheet() {
 
         {/* Perícias */}
         <div className="card pericias-card full-width">
-          <h2>Perícias</h2>
+          <div className="pericias-header">
+            <h2>Perícias</h2>
+            <button 
+              onClick={() => {
+                const nomePericia = prompt('Nome da nova perícia:');
+                if (nomePericia && nomePericia.trim()) {
+                  const atributoPericia = prompt('Atributo (FOR/AGI/INT/PRE/VIG):');
+                  if (atributoPericia && ['FOR', 'AGI', 'INT', 'PRE', 'VIG'].includes(atributoPericia.toUpperCase())) {
+                    const novaPericia = {
+                      nome: nomePericia.trim(),
+                      atributo: atributoPericia.toUpperCase()
+                    };
+                    const novasPericias = [...pericias, novaPericia];
+                    setPericias(novasPericias);
+                    // Opcional: salvar no backend
+                  }
+                }
+              }}
+              className="btn-add-pericia"
+            >
+              + Adicionar Perícia
+            </button>
+          </div>
           <div className="pericias-list">
             {pericias.map(pericia => {
               const atributo = character.atributos[pericia.atributo] || 0;
               const nivelTreinamento = character.pericias?.[pericia.nome] || null;
               
-              // Calcular bônus baseado no nível de treinamento
+              // Calcular bônus baseado no nível de treinamento (máximo 5)
               let bonusTreinamento = 0;
-              if (nivelTreinamento === 'treinado') bonusTreinamento = 5;
+              let nivelNumero = 0;
+              if (typeof nivelTreinamento === 'number') {
+                nivelNumero = Math.min(5, Math.max(0, nivelTreinamento));
+                bonusTreinamento = nivelNumero * 5; // Cada nível = +5
+              } else if (nivelTreinamento === 'treinado') bonusTreinamento = 5;
               else if (nivelTreinamento === 'veterano') bonusTreinamento = 10;
               else if (nivelTreinamento === 'expert') bonusTreinamento = 15;
               
               const total = atributo + bonusTreinamento;
-              const isTreinada = nivelTreinamento !== null;
+              const isTreinada = nivelTreinamento !== null && nivelTreinamento !== 0;
 
               return (
                 <div
                   key={pericia.nome}
                   className={`pericia-item ${isTreinada ? 'treinada' : ''}`}
-                  onClick={() => handleRollPericia(pericia)}
                 >
-                  <div className="pericia-info">
-                    <span className="pericia-nome">{pericia.nome}</span>
-                    <span className="pericia-attr">({pericia.atributo})</span>
-                    {nivelTreinamento && (
-                      <span className={`pericia-nivel ${nivelTreinamento}`}>
-                        {nivelTreinamento === 'treinado' ? 'T' : nivelTreinamento === 'veterano' ? 'V' : 'E'}
-                      </span>
-                    )}
+                  <div className="pericia-main" onClick={() => handleRollPericia(pericia)}>
+                    <div className="pericia-info">
+                      <span className="pericia-nome">{pericia.nome}</span>
+                      <span className="pericia-attr">({pericia.atributo})</span>
+                      {nivelTreinamento && (
+                        <span className={`pericia-nivel ${nivelTreinamento}`}>
+                          {typeof nivelTreinamento === 'number' ? `Nv.${nivelTreinamento}` : 
+                           nivelTreinamento === 'treinado' ? 'T' : 
+                           nivelTreinamento === 'veterano' ? 'V' : 'E'}
+                        </span>
+                      )}
+                    </div>
+                    <div className="pericia-bonus">
+                      {atributo > 0 ? `+${atributo}` : atributo}
+                      {bonusTreinamento > 0 && <span className="bonus-treinamento">+{bonusTreinamento}</span>}
+                      {total !== 0 && <span className="total-bonus"> = {total > 0 ? '+' : ''}{total}</span>}
+                    </div>
                   </div>
-                  <div className="pericia-bonus">
-                    {atributo > 0 ? `+${atributo}` : atributo}
-                    {bonusTreinamento > 0 && <span className="bonus-treinamento">+{bonusTreinamento}</span>}
-                    {total !== 0 && <span className="total-bonus"> = {total > 0 ? '+' : ''}{total}</span>}
+                  <div className="pericia-controls">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const novasPericias = { ...character.pericias };
+                        const nivelAtual = typeof novasPericias[pericia.nome] === 'number' ? 
+                          novasPericias[pericia.nome] : 
+                          (novasPericias[pericia.nome] === 'treinado' ? 1 :
+                           novasPericias[pericia.nome] === 'veterano' ? 2 :
+                           novasPericias[pericia.nome] === 'expert' ? 3 : 0);
+                        if (nivelAtual > 0) {
+                          const novoNivel = nivelAtual - 1;
+                          if (novoNivel === 0) {
+                            delete novasPericias[pericia.nome];
+                          } else {
+                            novasPericias[pericia.nome] = Math.min(5, novoNivel);
+                          }
+                        }
+                        updateCharacter({ pericias: novasPericias });
+                      }}
+                      className="btn-pericia-dec"
+                      disabled={!isTreinada}
+                    >
+                      -
+                    </button>
+                    <span className="pericia-level">{typeof nivelTreinamento === 'number' ? nivelTreinamento : nivelNumero}/5</span>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const novasPericias = { ...character.pericias };
+                        const nivelAtual = typeof novasPericias[pericia.nome] === 'number' ? 
+                          novasPericias[pericia.nome] : 
+                          (novasPericias[pericia.nome] === 'treinado' ? 1 :
+                           novasPericias[pericia.nome] === 'veterano' ? 2 :
+                           novasPericias[pericia.nome] === 'expert' ? 3 : 0);
+                        if (nivelAtual < 5) {
+                          novasPericias[pericia.nome] = nivelAtual + 1;
+                          updateCharacter({ pericias: novasPericias });
+                        }
+                      }}
+                      className="btn-pericia-inc"
+                      disabled={nivelTreinamento === 5 || (typeof nivelTreinamento === 'string' && nivelTreinamento === 'expert')}
+                    >
+                      +
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`Remover perícia "${pericia.nome}"?`)) {
+                          const novasPericias = [...pericias];
+                          const index = novasPericias.findIndex(p => p.nome === pericia.nome);
+                          if (index >= 0) {
+                            novasPericias.splice(index, 1);
+                            setPericias(novasPericias);
+                          }
+                          const novasPericiasChar = { ...character.pericias };
+                          delete novasPericiasChar[pericia.nome];
+                          updateCharacter({ pericias: novasPericiasChar });
+                        }
+                      }}
+                      className="btn-pericia-remove"
+                    >
+                      ✕
+                    </button>
                   </div>
                 </div>
               );
@@ -363,6 +624,38 @@ function CharacterSheet() {
           )}
         </div>
 
+        {/* Conhecimento */}
+        <div className="card conhecimento-card">
+          <h2>Nível de Conhecimento</h2>
+          <div className="conhecimento-controls">
+            <button 
+              onClick={() => updateConhecimento(-5)}
+              className="btn-conhecimento"
+              disabled={(character.conhecimento || 0) <= 0}
+            >
+              -5
+            </button>
+            <div className="conhecimento-value">
+              <span className="conhecimento-label">Conhecimento:</span>
+              <span className="conhecimento-number">{character.conhecimento || 0}</span>
+            </div>
+            <button 
+              onClick={() => updateConhecimento(5)}
+              className="btn-conhecimento"
+            >
+              +5
+            </button>
+            <input
+              type="number"
+              min="0"
+              value={character.conhecimento || 0}
+              onChange={(e) => updateCharacter({ conhecimento: parseInt(e.target.value) || 0 })}
+              className="conhecimento-input"
+              placeholder="Editar manualmente"
+            />
+          </div>
+        </div>
+
         {/* Rituais */}
         <div className="card rituais-card">
           <h2>Rituais Conhecidos</h2>
@@ -391,13 +684,33 @@ function CharacterSheet() {
 
         {/* Inventário */}
         <div className="card inventory-card full-width">
-          <h2>Inventário</h2>
+          <div className="inventory-header-section">
+            <h2>Inventário</h2>
+            <button 
+              onClick={() => setShowAddItemModal(true)}
+              className="btn-add-item"
+            >
+              + Adicionar Item
+            </button>
+          </div>
           <div className="inventory-header">
-            <span>Espaço Usado: {character.espacoUsado || 0} / {character.espacoTotal || 10}</span>
+            <div className="espaco-controls">
+              <span>Espaço Usado: {character.espacoUsado || 0} / {character.espacoTotal || 10}</span>
+              <div className="espaco-edit">
+                <label>Slots: </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={character.espacoTotal || 10}
+                  onChange={(e) => updateEspacoTotal(parseInt(e.target.value) || 10)}
+                  className="espaco-input"
+                />
+              </div>
+            </div>
             <div className="inventory-bar">
               <div 
                 className="inventory-fill"
-                style={{ width: `${((character.espacoUsado || 0) / (character.espacoTotal || 10)) * 100}%` }}
+                style={{ width: `${Math.min(100, ((character.espacoUsado || 0) / (character.espacoTotal || 10)) * 100)}%` }}
               />
             </div>
           </div>
@@ -406,9 +719,51 @@ function CharacterSheet() {
             <div className="inventory-items">
               {character.inventario.map((item, index) => (
                 <div key={index} className="inventory-item">
-                  <span className="item-name">{item.nome || item}</span>
-                  {item.quantidade && <span className="item-qty">x{item.quantidade}</span>}
-                  {item.espaco && <span className="item-space">{item.espaco} espaço(s)</span>}
+                  <div className="item-info">
+                    <span className="item-name">{item.nome || item}</span>
+                    {item.tipo && <span className="item-type">({item.tipo})</span>}
+                    {item.dano && <span className="item-dano">Dano: {item.dano}</span>}
+                  </div>
+                  <div className="item-controls">
+                    {item.quantidade > 1 && (
+                      <button 
+                        onClick={() => updateItemQuantity(index, -1)}
+                        className="btn-quantity"
+                      >
+                        -
+                      </button>
+                    )}
+                    {item.quantidade && <span className="item-qty">x{item.quantidade}</span>}
+                    <button 
+                      onClick={() => updateItemQuantity(index, 1)}
+                      className="btn-quantity"
+                    >
+                      +
+                    </button>
+                    {item.espaco && <span className="item-space">{item.espaco * (item.quantidade || 1)} espaço(s)</span>}
+                    {item.tipo === 'arma' && (
+                      <div className="weapon-actions">
+                        <button 
+                          onClick={() => handleRollAttack(item)}
+                          className="btn-attack"
+                        >
+                          🎯 Atacar
+                        </button>
+                        <button 
+                          onClick={() => handleRollDamage(item)}
+                          className="btn-damage"
+                        >
+                          ⚔️ Dano
+                        </button>
+                      </div>
+                    )}
+                    <button 
+                      onClick={() => removeItemFromInventory(index)}
+                      className="btn-remove-item"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -416,6 +771,98 @@ function CharacterSheet() {
             <p className="empty-text">Inventário vazio</p>
           )}
         </div>
+
+        {/* Modal de Adicionar Item */}
+        {showAddItemModal && (
+          <div className="modal-overlay" onClick={() => setShowAddItemModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Adicionar Item ao Inventário</h3>
+                <button onClick={() => setShowAddItemModal(false)} className="btn-close-modal">✕</button>
+              </div>
+              <div className="modal-body">
+                <div className="item-type-selector">
+                  <button 
+                    className={itemType === 'arma' ? 'active' : ''}
+                    onClick={() => setItemType('arma')}
+                  >
+                    ⚔️ Armas
+                  </button>
+                  <button 
+                    className={itemType === 'equipamento' ? 'active' : ''}
+                    onClick={() => setItemType('equipamento')}
+                  >
+                    🎒 Equipamentos
+                  </button>
+                  <button 
+                    className={itemType === 'municao' ? 'active' : ''}
+                    onClick={() => setItemType('municao')}
+                  >
+                    🔫 Munições
+                  </button>
+                  <button 
+                    className={itemType === 'protecao' ? 'active' : ''}
+                    onClick={() => setItemType('protecao')}
+                  >
+                    🛡️ Proteções
+                  </button>
+                </div>
+                <div className="items-list-modal">
+                  {itemType === 'arma' && armas.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="modal-item"
+                      onClick={() => addItemToInventory(item, 'arma')}
+                    >
+                      <div className="modal-item-name">{item.nome}</div>
+                      <div className="modal-item-details">
+                        <span>Dano: {item.dano}</span>
+                        <span>Espaço: {item.espaco}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {itemType === 'equipamento' && equipamentos.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="modal-item"
+                      onClick={() => addItemToInventory(item, 'equipamento')}
+                    >
+                      <div className="modal-item-name">{item.nome}</div>
+                      <div className="modal-item-details">
+                        <span>Espaço: {item.espaco}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {itemType === 'municao' && municoes.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="modal-item"
+                      onClick={() => addItemToInventory(item, 'municao')}
+                    >
+                      <div className="modal-item-name">{item.nome}</div>
+                      <div className="modal-item-details">
+                        <span>Espaço: {item.espaco}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {itemType === 'protecao' && protecoes.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="modal-item"
+                      onClick={() => addItemToInventory(item, 'protecao')}
+                    >
+                      <div className="modal-item-name">{item.nome}</div>
+                      <div className="modal-item-details">
+                        <span>Defesa: +{item.defesa}</span>
+                        <span>Espaço: {item.espaco}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Descrição e História */}
         <div className="card description-card full-width">
